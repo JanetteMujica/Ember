@@ -1,0 +1,40 @@
+@"
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>CAFYP - Care Assistant For Your Pain</title>
+		<link rel="stylesheet" href="css/styles.css" />
+	</head>
+	<body>
+		<header>
+			<h1>CAFYP</h1>
+			<h2>A Care Assistant For Your Pain</h2>
+		</header>
+
+		<main>
+			<div id="chat-container">
+				<!-- Rasa chat widget will be embedded here -->
+				<div id="rasa-chat-widget"></div>
+			</div>
+
+			<div id="visualization-container">
+				<h3>Your Pain Visualization</h3>
+				<div id="chart-container">
+					<!-- Chart.js visualizations will go here -->
+					<canvas id="pain-chart"></canvas>
+				</div>
+			</div>
+		</main>
+
+		<footer>
+			<p>Developed by Janette Mujica-Zepeda</p>
+		</footer>
+
+		<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/rasa-webchat@1.x.x/lib/index.min.js"></script>
+		<script src="js/main.js"></script>
+	</body>
+</html>
+"@ | Out-File -FilePath "frontend\index.html" -Encoding utf8

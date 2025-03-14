@@ -1,0 +1,72 @@
+@"
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+}
+
+header {
+    background-color: #35424a;
+    color: white;
+    padding: 20px;
+    text-align: center;
+}
+
+main {
+    display: flex;
+    flex-wrap: wrap;
+    padding: 20px;
+    gap: 20px;
+}
+
+#chat-container {
+    flex: 1;
+    min-width: 300px;
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    height: 500px;
+}
+
+#visualization-container {
+    flex: 1;
+    min-width: 300px;
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    height: 500px;
+}
+
+footer {
+    background-color: #35424a;
+    color: white;
+    text-align: center;
+    padding: 10px;
+}
+
+/* Accessibility improvements for Parkinson's patients */
+button {
+    min-height: 44px;
+    min-width: 44px;
+    padding: 10px 15px;
+    margin: 5px;
+    font-size: 16px;
+}
+
+input, select {
+    min-height: 44px;
+    font-size: 16px;
+    padding: 5px 10px;
+}
+
+/* High contrast elements */
+.high-contrast {
+    color: black;
+    background-color: white;
+    border: 2px solid black;
+}
+"@ | Out-File -FilePath "frontend\css\styles.css" -Encoding utf8
