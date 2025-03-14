@@ -1,40 +1,177 @@
-@"
 <!DOCTYPE html>
 <html lang="en">
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>CAFYP - Care Assistant For Your Pain</title>
-		<link rel="stylesheet" href="css/styles.css" />
+		<link rel="stylesheet" href="css/govuk-mobile-first.css" />
 	</head>
 	<body>
-		<header>
-			<h1>CAFYP</h1>
-			<h2>A Care Assistant For Your Pain</h2>
+		<!-- Header based on Home Office design system -->
+		<header class="ho-header">
+			<div class="ho-header__container">
+				<div class="ho-header__logo">
+					<a href="/" class="ho-header__logo-link">
+						<!-- Logo image - replace the src with your actual logo path -->
+						<img
+							src="img/cafyp-logo.png"
+							alt="CAFYP Logo"
+							class="ho-header__logo-image"
+						/>
+						<!-- Fallback text in case image fails to load -->
+						<span class="ho-visually-hidden">CAFYP</span>
+					</a>
+				</div>
+
+				<!-- Mobile menu toggle button (hidden on desktop) -->
+				<button
+					class="mobile-menu-toggle"
+					aria-expanded="false"
+					aria-controls="navigation"
+				>
+					Menu
+				</button>
+
+				<nav class="ho-header__navigation" id="navigation">
+					<ul class="ho-header__navigation-list">
+						<li class="ho-header__navigation-item">
+							<a href="/track" class="ho-header__navigation-link">Track</a>
+						</li>
+						<li class="ho-header__navigation-item">
+							<a href="/visualization" class="ho-header__navigation-link"
+								>Visualization</a
+							>
+						</li>
+						<li class="ho-header__navigation-item">
+							<a href="/accessibility" class="ho-header__navigation-link"
+								>Accessibility</a
+							>
+						</li>
+					</ul>
+				</nav>
+			</div>
 		</header>
 
-		<main>
-			<div id="chat-container">
-				<!-- Rasa chat widget will be embedded here -->
-				<div id="rasa-chat-widget"></div>
-			</div>
+		<!-- Welcome section (hero) in GOV.UK style -->
+		<section class="hero">
+			<div class="hero__container">
+				<h1 class="ho-heading-xl">CAFYP</h1>
+				<h1>
+					Helps you track and reflect on your pain episodes with visualizations.
+				</h1>
+				<p class="ho-body-l">
+					A digital assistant designed specifically for people living with
+					Parkinson's disease.
+				</p>
 
-			<div id="visualization-container">
-				<h3>Your Pain Visualization</h3>
-				<div id="chart-container">
-					<!-- Chart.js visualizations will go here -->
-					<canvas id="pain-chart"></canvas>
+				<div class="button-group">
+					<a href="/track" class="ho-button">Start tracking pain</a>
+					<a href="/visualization" class="ho-button ho-button--secondary"
+						>View visualizations</a
+					>
+				</div>
+			</div>
+		</section>
+
+		<!-- Main content area -->
+		<main class="ho-main">
+			<div class="ho-width-container">
+				<div class="ho-grid-row">
+					<!-- First section -->
+					<div class="ho-grid-column-two-thirds">
+						<h2 class="ho-heading-l">How CAFYP works</h2>
+						<p class="ho-body">
+							CAFYP (Care Assistant For Your Pain) helps you track and analyze
+							pain episodes related to Parkinson's disease. By recording your
+							experiences, you can identify patterns and share detailed
+							information with your healthcare providers.
+						</p>
+
+						<h3 class="ho-heading-m">Track your pain</h3>
+						<p class="ho-body">
+							Use our simple form to record pain episodes when they occur. Note
+							the location, intensity, duration, and factors that might be
+							relevant.
+						</p>
+						<p class="ho-body">
+							<a href="/track" class="ho-link">Start tracking your pain</a>
+						</p>
+
+						<h3 class="ho-heading-m">Visualize patterns</h3>
+						<p class="ho-body">
+							See your pain data displayed in easy-to-understand charts and
+							graphs. Identify patterns related to time of day, activities, or
+							medication schedules.
+						</p>
+						<p class="ho-body">
+							<a href="/visualization" class="ho-link"
+								>View your visualizations</a
+							>
+						</p>
+					</div>
+
+					<!-- Side panel -->
+					<div class="ho-grid-column-one-third">
+						<div class="ho-panel">
+							<h2 class="ho-heading-m">Help and support</h2>
+							<p class="ho-body">
+								Get assistance with using CAFYP or managing your pain.
+							</p>
+							<a
+								href="/help"
+								class="ho-button ho-button--secondary ho-width-full"
+								>Contact support</a
+							>
+
+							<h3 class="ho-heading-s">Useful resources</h3>
+							<ul class="ho-list ho-list--bullet">
+								<li>
+									<a href="#" class="ho-link"
+										>Understanding pain in Parkinson's</a
+									>
+								</li>
+								<li>
+									<a href="#" class="ho-link">Pain management strategies</a>
+								</li>
+								<li><a href="#" class="ho-link">Talking to your doctor</a></li>
+							</ul>
+						</div>
+					</div>
 				</div>
 			</div>
 		</main>
 
-		<footer>
-			<p>Developed by Janette Mujica-Zepeda</p>
+		<!-- Footer -->
+		<footer class="ho-footer">
+			<div class="ho-width-container">
+				<div class="ho-footer__meta">
+					<div class="ho-footer__meta-item">
+						<h2 class="ho-visually-hidden">Support links</h2>
+						<ul class="ho-footer__inline-list">
+							<li class="ho-footer__inline-list-item">
+								<a class="ho-footer__link" href="/accessibility"
+									>Accessibility</a
+								>
+							</li>
+							<li class="ho-footer__inline-list-item">
+								<a class="ho-footer__link" href="/privacy">Privacy policy</a>
+							</li>
+							<li class="ho-footer__inline-list-item">
+								<a class="ho-footer__link" href="/terms"
+									>Terms and conditions</a
+								>
+							</li>
+						</ul>
+						<div class="ho-footer__meta-custom">
+							<p class="ho-body-s">Developed by Janette Mujica-Zepeda</p>
+							<p class="ho-body-s">© 2025 CAFYP Project</p>
+						</div>
+					</div>
+				</div>
+			</div>
 		</footer>
 
-		<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-		<script src="https://cdn.jsdelivr.net/npm/rasa-webchat@1.x.x/lib/index.min.js"></script>
+		<!-- JavaScript for mobile menu toggle and other interactions -->
 		<script src="js/main.js"></script>
 	</body>
 </html>
-"@ | Out-File -FilePath "frontend\index.html" -Encoding utf8
