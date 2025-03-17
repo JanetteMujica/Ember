@@ -1,14 +1,15 @@
+// webpack.config.js
 const path = require('path');
 
 module.exports = {
 	mode: 'development',
 	entry: {
-		'pain-chatbot-bundle': './frontend/js/pain-chatbot-entry.js',
-		'pain-visualization-bundle': './frontend/js/pain-visualization-entry.js',
+		'pain-chatbot-bundle': './src/js/pain-chatbot-entry.js',
+		'pain-visualization-bundle': './src/js/pain-visualization-entry.js',
 	},
 	output: {
 		filename: '[name].js',
-		path: path.resolve(__dirname, 'frontend/dist'),
+		path: path.resolve(__dirname, 'public/assets/js'),
 	},
 	module: {
 		rules: [
