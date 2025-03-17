@@ -1,0 +1,19 @@
+{
+	"name": "ember-frontend",
+	"version": "1.0.0",
+	"description": "Ember Frontend Application",
+	"main": "index.js",
+	"scripts": {
+		"start": "ember serve",
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"keywords": [
+		"ember",
+		"frontend"
+	],
+	"author": "",
+	"license": "ISC",
+	"dependencies": {
+		"ember-cli": "^4.2.0"
+	}
+}
