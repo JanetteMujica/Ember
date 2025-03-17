@@ -5,56 +5,253 @@ intents:
   - goodbye
   - affirm
   - deny
-  - mood_great
-  - mood_unhappy
-  - bot_challenge
+  - start_pain_assessment
+  - provide_pain_intensity
+  - provide_pain_location
+  - provide_pain_quality
+  - provide_pain_duration
+  - provide_pain_triggers
+  - provide_pain_relievers
+  - provide_sleep_quality
+  - provide_mood_state
+  - provide_activity_level
+  - help
+  - repeat_question
+  - speak_slower
+  - speak_louder
+  - simplify_question
 
-responses:
-  utter_greet:
-    - text: 'Hey! How are you?'
-
-  utter_cheer_up:
-    - text: 'Here is something to cheer you up:'
-      image: 'https://i.imgur.com/nGF1K8f.jpg'
-
-  utter_did_that_help:
-    - text: 'Did that help you?'
-
-  utter_happy:
-    - text: 'Great, carry on!'
-
-  utter_goodbye:
-    - text: 'Bye'
-
-  utter_iamabot:
-    - text: 'I am a bot, powered by Rasa.'
-
-session_config:
-  session_expiration_time: 60
-  carry_over_slots_to_new_session: true
-
-forms:
-  pain_assessment_form:
-    required_slots:
-      - pain_level
-      - pain_location
-      - pain_duration
+entities:
+  - pain_intensity
+  - pain_location
+  - pain_quality
+  - pain_duration
+  - pain_trigger
+  - pain_reliever
+  - sleep_quality
+  - mood_state
+  - activity_level
 
 slots:
-  pain_level:
-    type: text
+  pain_intensity:
+    type: float
     mappings:
       - type: from_entity
-        entity: pain_level
-
+        entity: pain_intensity
   pain_location:
-    type: text
+    type: list
     mappings:
       - type: from_entity
         entity: pain_location
-
+  pain_quality:
+    type: list
+    mappings:
+      - type: from_entity
+        entity: pain_quality
   pain_duration:
     type: text
     mappings:
       - type: from_entity
         entity: pain_duration
+  pain_triggers:
+    type: list
+    mappings:
+      - type: from_entity
+        entity: pain_trigger
+  pain_relievers:
+    type: list
+    mappings:
+      - type: from_entity
+        entity: pain_reliever
+  sleep_quality:
+    type: text
+    mappings:
+      - type: from_entity
+        entity: sleep_quality
+  mood_state:
+    type: text
+    mappings:
+      - type: from_entity
+        entity: mood_state
+  activity_level:
+    type: text
+    mappings:
+      - type: from_entity
+        entity: activity_level
+  assessment_complete:
+    type: bool
+    initial_value: false
+    mappings:
+      - type: custom
+
+responses:
+  utter_greet:
+    - text: "Hello. I'm here to help track your pain. Would you like to start a pain assessment now?"
+      buttons:
+        - title: 'Yes'
+          payload: '/affirm'
+        - title: 'No'
+          payload: '/deny'
+
+  utter_goodbye:
+    - text: 'Take care. Remember you can return anytime to update your pain information.'
+
+  utter_ask_pain_intensity:
+    - text: 'On a scale from 0 to 10, where 0 is no pain and 10 is the worst pain imaginable, how would you rate your pain right now?'
+      buttons:
+        - title: '0'
+          payload: '/provide_pain_intensity{"pain_intensity": 0}'
+        - title: '1'
+          payload: '/provide_pain_intensity{"pain_intensity": 1}'
+        - title: '2'
+          payload: '/provide_pain_intensity{"pain_intensity": 2}'
+        - title: '3'
+          payload: '/provide_pain_intensity{"pain_intensity": 3}'
+        - title: '4'
+          payload: '/provide_pain_intensity{"pain_intensity": 4}'
+        - title: '5'
+          payload: '/provide_pain_intensity{"pain_intensity": 5}'
+        - title: '6'
+          payload: '/provide_pain_intensity{"pain_intensity": 6}'
+        - title: '7'
+          payload: '/provide_pain_intensity{"pain_intensity": 7}'
+        - title: '8'
+          payload: '/provide_pain_intensity{"pain_intensity": 8}'
+        - title: '9'
+          payload: '/provide_pain_intensity{"pain_intensity": 9}'
+        - title: '10'
+          payload: '/provide_pain_intensity{"pain_intensity": 10}'
+
+  utter_ask_pain_location:
+    - text: 'Where are you feeling pain? You can select multiple areas.'
+      buttons:
+        - title: 'Head'
+          payload: '/provide_pain_location{"pain_location": "head"}'
+        - title: 'Neck'
+          payload: '/provide_pain_location{"pain_location": "neck"}'
+        - title: 'Shoulders'
+          payload: '/provide_pain_location{"pain_location": "shoulders"}'
+        - title: 'Back'
+          payload: '/provide_pain_location{"pain_location": "back"}'
+        - title: 'Arms'
+          payload: '/provide_pain_location{"pain_location": "arms"}'
+        - title: 'Hands'
+          payload: '/provide_pain_location{"pain_location": "hands"}'
+        - title: 'Legs'
+          payload: '/provide_pain_location{"pain_location": "legs"}'
+        - title: 'Feet'
+          payload: '/provide_pain_location{"pain_location": "feet"}'
+        - title: 'Chest'
+          payload: '/provide_pain_location{"pain_location": "chest"}'
+        - title: 'Abdomen'
+          payload: '/provide_pain_location{"pain_location": "abdomen"}'
+        - title: 'Other'
+          payload: '/provide_pain_location{"pain_location": "other"}'
+
+  utter_ask_pain_quality:
+    - text: 'How would you describe your pain? Select all that apply.'
+      buttons:
+        - title: 'Aching'
+          payload: '/provide_pain_quality{"pain_quality": "aching"}'
+        - title: 'Burning'
+          payload: '/provide_pain_quality{"pain_quality": "burning"}'
+        - title: 'Sharp'
+          payload: '/provide_pain_quality{"pain_quality": "sharp"}'
+        - title: 'Dull'
+          payload: '/provide_pain_quality{"pain_quality": "dull"}'
+        - title: 'Throbbing'
+          payload: '/provide_pain_quality{"pain_quality": "throbbing"}'
+        - title: 'Stabbing'
+          payload: '/provide_pain_quality{"pain_quality": "stabbing"}'
+        - title: 'Numbness'
+          payload: '/provide_pain_quality{"pain_quality": "numbness"}'
+        - title: 'Tingling'
+          payload: '/provide_pain_quality{"pain_quality": "tingling"}'
+
+  utter_ask_pain_duration:
+    - text: 'How long have you been experiencing this pain?'
+      buttons:
+        - title: 'Less than a day'
+          payload: '/provide_pain_duration{"pain_duration": "less than a day"}'
+        - title: '1-3 days'
+          payload: '/provide_pain_duration{"pain_duration": "1-3 days"}'
+        - title: '4-7 days'
+          payload: '/provide_pain_duration{"pain_duration": "4-7 days"}'
+        - title: '1-2 weeks'
+          payload: '/provide_pain_duration{"pain_duration": "1-2 weeks"}'
+        - title: '2-4 weeks'
+          payload: '/provide_pain_duration{"pain_duration": "2-4 weeks"}'
+        - title: '1-3 months'
+          payload: '/provide_pain_duration{"pain_duration": "1-3 months"}'
+        - title: '3+ months'
+          payload: '/provide_pain_duration{"pain_duration": "3+ months"}'
+
+  utter_ask_sleep_quality:
+    - text: 'How has your sleep been affected by your pain in the past week?'
+      buttons:
+        - title: 'Not affected'
+          payload: '/provide_sleep_quality{"sleep_quality": "not affected"}'
+        - title: 'Slightly affected'
+          payload: '/provide_sleep_quality{"sleep_quality": "slightly affected"}'
+        - title: 'Moderately affected'
+          payload: '/provide_sleep_quality{"sleep_quality": "moderately affected"}'
+        - title: 'Severely affected'
+          payload: '/provide_sleep_quality{"sleep_quality": "severely affected"}'
+        - title: 'Cannot sleep'
+          payload: '/provide_sleep_quality{"sleep_quality": "cannot sleep"}'
+
+  utter_ask_mood_state:
+    - text: 'How would you describe your mood today?'
+      buttons:
+        - title: 'Good'
+          payload: '/provide_mood_state{"mood_state": "good"}'
+        - title: 'Okay'
+          payload: '/provide_mood_state{"mood_state": "okay"}'
+        - title: 'Sad'
+          payload: '/provide_mood_state{"mood_state": "sad"}'
+        - title: 'Anxious'
+          payload: '/provide_mood_state{"mood_state": "anxious"}'
+        - title: 'Irritable'
+          payload: '/provide_mood_state{"mood_state": "irritable"}'
+        - title: 'Depressed'
+          payload: '/provide_mood_state{"mood_state": "depressed"}'
+
+  utter_ask_activity_level:
+    - text: 'How has pain affected your activity level today?'
+      buttons:
+        - title: 'Not limited'
+          payload: '/provide_activity_level{"activity_level": "not limited"}'
+        - title: 'Slightly limited'
+          payload: '/provide_activity_level{"activity_level": "slightly limited"}'
+        - title: 'Moderately limited'
+          payload: '/provide_activity_level{"activity_level": "moderately limited"}'
+        - title: 'Severely limited'
+          payload: '/provide_activity_level{"activity_level": "severely limited"}'
+        - title: 'Unable to perform activities'
+          payload: '/provide_activity_level{"activity_level": "unable to perform"}'
+
+  utter_assessment_complete:
+    - text: 'Thank you for completing the pain assessment. Your information has been recorded. Would you like to see a summary of your pain report?'
+
+  utter_help:
+    - text: "I'm here to help track your pain. You can use buttons to answer questions or type your responses. If you need me to repeat or simplify a question, just ask. You can say 'speak slower' or 'speak louder' if needed."
+
+  utter_repeat:
+    - text: "I'll repeat the question."
+
+  utter_simplify:
+    - text: 'Let me make this simpler.'
+
+  utter_speak_slower:
+    - text: "I'll speak slower."
+
+  utter_speak_louder:
+    - text: "I'll speak louder."
+
+actions:
+  - action_submit_pain_data
+  - action_generate_pain_report
+
+session_config:
+  session_expiration_time: 60
+  carry_over_slots_to_new_session: true

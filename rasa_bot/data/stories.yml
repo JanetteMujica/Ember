@@ -1,38 +1,64 @@
-version: "3.1"
+version: '3.1'
 
 stories:
+  - story: happy path
+    steps:
+      - intent: greet
+      - action: utter_greet
+      - intent: affirm
+      - action: utter_ask_pain_intensity
+      - intent: provide_pain_intensity
+      - action: utter_ask_pain_location
+      - intent: provide_pain_location
+      - action: utter_ask_pain_quality
+      - intent: provide_pain_quality
+      - action: utter_ask_pain_duration
+      - intent: provide_pain_duration
+      - action: utter_ask_sleep_quality
+      - intent: provide_sleep_quality
+      - action: utter_ask_mood_state
+      - intent: provide_mood_state
+      - action: utter_ask_activity_level
+      - intent: provide_activity_level
+      - action: action_submit_pain_data
+      - action: utter_assessment_complete
+      - intent: affirm
+      - action: action_generate_pain_report
+      - intent: goodbye
+      - action: utter_goodbye
 
-- story: happy path
-  steps:
-  - intent: greet
-  - action: utter_greet
-  - intent: mood_great
-  - action: utter_happy
+  - story: decline assessment
+    steps:
+      - intent: greet
+      - action: utter_greet
+      - intent: deny
+      - action: utter_goodbye
 
-- story: sad path 1
-  steps:
-  - intent: greet
-  - action: utter_greet
-  - intent: mood_unhappy
-  - action: utter_cheer_up
-  - action: utter_did_that_help
-  - intent: affirm
-  - action: utter_happy
+  - story: accessibility - repeat question
+    steps:
+      - intent: repeat_question
+      - action: utter_repeat
+    # Action will repeat the last question
 
-- story: sad path 2
-  steps:
-  - intent: greet
-  - action: utter_greet
-  - intent: mood_unhappy
-  - action: utter_cheer_up
-  - action: utter_did_that_help
-  - intent: deny
-  - action: utter_goodbye
+  - story: accessibility - simplify question
+    steps:
+      - intent: simplify_question
+      - action: utter_simplify
+    # Action will simplify the last question
 
-  - story: pain assessment form
-  steps:
-  - intent: report_pain
-  - action: pain_assessment_form
-  - active_loop: pain_assessment_form
-  - active_loop: null
-  - action: action_submit_pain_assessment
+  - story: accessibility - speak slower
+    steps:
+      - intent: speak_slower
+      - action: utter_speak_slower
+    # This can trigger text-to-speech to slow down
+
+  - story: accessibility - speak louder
+    steps:
+      - intent: speak_louder
+      - action: utter_speak_louder
+    # This can trigger text-to-speech to increase volume
+
+  - story: help
+    steps:
+      - intent: help
+      - action: utter_help
