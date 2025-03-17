@@ -625,3 +625,17 @@ body {
 		font-size: var(--font-size-36);
 	}
 }
+
+/* Containr for chatbot and pain vizualisation */
+
+.pain-chatbot-container {
+	width: 100%;
+	max-width: 500px;
+	margin: 20px auto;
+	height: 600px;
+}
+
+.pain-visualization-container {
+	width: 100%;
+	margin: 20px auto;
+}
