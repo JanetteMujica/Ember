@@ -1,4 +1,14 @@
-/* 
+/* Custom styles for hero section text */
+.hero .ho-heading-xl,
+.hero .ho-body-l {
+	color: var(--color-text-light);
+}
+
+/* Added emphasis for the "CAFYP" part of the heading */
+.hero .cafyp-emphasis {
+	color: var(--color-blue-light);
+	font-weight: bold;
+} /* 
  * CAFYP - GOV.UK Inspired Stylesheet (Mobile-First)
  * Based on Home Office Design System
  */
@@ -190,13 +200,13 @@ body {
 .ho-header {
 	background-color: var(--color-bg-dark);
 	padding: var(--space-2) 0;
-	border-bottom: 5px solid var(--color-blue-light);
 }
 
 .ho-header__container {
 	display: flex;
-	flex-direction: column; /* Stack on mobile */
+	flex-direction: row; /* Stack on mobile */
 	align-items: flex-start;
+	justify-content: space-between;
 	width: 100%;
 	padding: 0 var(--space-3);
 }
@@ -284,7 +294,7 @@ body {
 
 /* Hero section - Mobile First */
 .hero {
-	background-color: var(--color-primary-bg);
+	background-color: var(--color-bg-dark);
 	padding: var(--space-4) 0; /* Less padding on mobile */
 	border-bottom: 1px solid #d8d8d8;
 }
@@ -313,37 +323,65 @@ body {
 	width: 100%;
 	padding: var(--space-2) var(--space-2);
 	border: 0;
-	background-color: var(--color-primary);
-	color: var(--color-text-light);
+	background-color: var(
+		--color-blue-light
+	); /* Changed to blue for better contrast */
+	color: var(
+		--color-text-dark
+	); /* Dark text on light background for better contrast */
 	font-size: var(--font-size-16); /* Smaller on mobile */
 	font-weight: 700;
 	line-height: 1.5;
 	text-align: center;
 	text-decoration: none;
 	cursor: pointer;
-	border-radius: 0;
+	border-radius: 4px; /* Added slight rounding for better usability */
 	-webkit-appearance: none;
 	margin-right: 0;
 	margin-bottom: var(--space-3);
+	border: 3px solid var(--color-text-dark);
+	/*box-shadow: 0 2px 0 var(--color-blue-dark); /* Added shadow for depth */
 }
 
 .ho-button:hover {
-	background-color: var(--color-primary-light);
+	background-color: var(--color-primary);
+	color: var(--color-text-light);
+	border-color: var(--color-bg-alt);
 }
 
 .ho-button:focus {
-	background-color: var(--color-primary);
+	background-color: var(--color-blue-light);
 	outline: 3px solid var(--color-blue-light);
+	outline-offset: 3px;
+	box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.5);
+}
+
+.ho-button:active {
+	background-color: var(--color-blue-dark);
+	color: var(--color-text-light);
+	transform: translateY(1px);
+	box-shadow: 0 1px 0 var(--color-text-dark);
 }
 
 .ho-button--secondary {
-	background-color: var(--color-blue-dark);
-	color: var(--color-text-light);
+	background-color: var(--color-text-light);
+	color: var(--color-text-dark);
+	border: 3px solid var(--color-text-dark);
+	box-shadow: none;
+	border-radius: 4px;
 }
 
 .ho-button--secondary:hover {
-	background-color: var(--color-blue-light);
+	background-color: var(--color-bg-dark);
+	color: var(--color-text-light);
+	border-color: var(--color-bg-alt);
+}
+
+.ho-button--secondary:focus {
+	background-color: var(--color-text-light);
 	color: var(--color-text-dark);
+	outline: 3px solid var(--color-blue-light);
+	outline-offset: 3px;
 }
 
 .ho-width-full {

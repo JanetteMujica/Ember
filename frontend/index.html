@@ -3,7 +3,10 @@
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>CAFYP - Care Assistant For Your Pain</title>
+		<title>
+			Ember - A digital assistant designed to empower people living with chronic
+			pain.
+		</title>
 		<link rel="stylesheet" href="css/govuk-mobile-first.css" />
 	</head>
 	<body>
@@ -14,12 +17,12 @@
 					<a href="/" class="ho-header__logo-link">
 						<!-- Logo image - replace the src with your actual logo path -->
 						<img
-							src="img/cafyp-logo.png"
+							src="img/smileyRobo_color.svg"
 							alt="CAFYP Logo"
 							class="ho-header__logo-image"
 						/>
 						<!-- Fallback text in case image fails to load -->
-						<span class="ho-visually-hidden">CAFYP</span>
+						<span class="ho-visually-hidden">Ember</span>
 					</a>
 				</div>
 
@@ -38,36 +41,39 @@
 							<a href="/track" class="ho-header__navigation-link">Track</a>
 						</li>
 						<li class="ho-header__navigation-item">
-							<a href="/visualization" class="ho-header__navigation-link"
-								>Visualization</a
+							<a href="/visualize" class="ho-header__navigation-link"
+								>Visualize</a
 							>
 						</li>
 						<li class="ho-header__navigation-item">
-							<a href="/accessibility" class="ho-header__navigation-link"
-								>Accessibility</a
-							>
+							<a href="/journal" class="ho-header__navigation-link">Journal</a>
 						</li>
 					</ul>
 				</nav>
 			</div>
 		</header>
 
-		<!-- Welcome section (hero) in GOV.UK style -->
+		<!-- Welcome section (hero) in GOV.UK style with dark background -->
 		<section class="hero">
 			<div class="hero__container">
-				<h1 class="ho-heading-xl">CAFYP</h1>
-				<h1>
+				<h1 class="ho-heading-xl">
+					<span class="cafyp-emphasis">Ember</span>
+				</h1>
+				<h1 class="ho-heading-xl">
 					Helps you track and reflect on your pain episodes with visualizations.
 				</h1>
 				<p class="ho-body-l">
-					A digital assistant designed specifically for people living with
-					Parkinson's disease.
+					A digital assistant designed to empower people living with chronic
+					pain.
 				</p>
 
 				<div class="button-group">
 					<a href="/track" class="ho-button">Start tracking pain</a>
-					<a href="/visualization" class="ho-button ho-button--secondary"
+					<a href="/visualize" class="ho-button ho-button--secondary"
 						>View visualizations</a
+					>
+					<a href="/journal" class="ho-button ho-button--secondary"
+						>Start Journaling</a
 					>
 				</div>
 			</div>
@@ -79,19 +85,16 @@
 				<div class="ho-grid-row">
 					<!-- First section -->
 					<div class="ho-grid-column-two-thirds">
-						<h2 class="ho-heading-l">How CAFYP works</h2>
+						<h2 class="ho-heading-l">How Ember works</h2>
 						<p class="ho-body">
-							CAFYP (Care Assistant For Your Pain) helps you track and analyze
-							pain episodes related to Parkinson's disease. By recording your
+							Ember helps you track and analyze pain episodes. By recording your
 							experiences, you can identify patterns and share detailed
 							information with your healthcare providers.
 						</p>
 
 						<h3 class="ho-heading-m">Track your pain</h3>
 						<p class="ho-body">
-							Use our simple form to record pain episodes when they occur. Note
-							the location, intensity, duration, and factors that might be
-							relevant.
+							Use our simple form to record your mood level, overall pain intensity, sleep quality and duration, activity interference due to pain, alertness level, and medications used.
 						</p>
 						<p class="ho-body">
 							<a href="/track" class="ho-link">Start tracking your pain</a>
@@ -107,6 +110,15 @@
 							<a href="/visualization" class="ho-link"
 								>View your visualizations</a
 							>
+              <h3 class="ho-heading-m">Journaling</h3>
+              <p class="ho-body">
+                Document your experiences, including pain-related thoughts, daily reflections, and summaries of doctor consultations or support group meetings.
+              </p>
+              <p class="ho-body">
+                <a href="/track" class="ho-link">Start journaling</a>
+              </p>
+
+              
 						</p>
 					</div>
 
@@ -127,13 +139,13 @@
 							<ul class="ho-list ho-list--bullet">
 								<li>
 									<a href="#" class="ho-link"
-										>Understanding pain in Parkinson's</a
+										>Understanding patient knowledge</a
 									>
 								</li>
 								<li>
 									<a href="#" class="ho-link">Pain management strategies</a>
 								</li>
-								<li><a href="#" class="ho-link">Talking to your doctor</a></li>
+								<li><a href="#" class="ho-link">Having meaningful consultation with your doctor</a></li>
 							</ul>
 						</div>
 					</div>
