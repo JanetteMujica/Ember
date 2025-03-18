@@ -1,5 +1,415 @@
-<!-- Add this in your main content area -->
-<div id="pain-visualization-root" class="pain-visualization-container"></div>
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Visualize Pain Data - Ember</title>
+		<link rel="stylesheet" href="css/govuk-mobile-first.css" />
+		<link rel="stylesheet" href="css/visualize.css" />
+	</head>
+	<body>
+		<!-- Header based on Home Office design system -->
+		<header class="ho-header">
+			<div class="ho-header__container">
+				<div class="ho-header__logo">
+					<a href="/" class="ho-header__logo-link">
+						<img
+							src="img/smileyRobo_color.svg"
+							alt="Ember Logo"
+							class="ho-header__logo-image"
+						/>
+						<span class="ho-visually-hidden">Ember</span>
+					</a>
+				</div>
 
-<!-- Add scripts for React and your component -->
-<script src="js/pain-visualization-bundle.js"></script>
+				<!-- Mobile menu toggle button (hidden on desktop) -->
+				<button
+					class="mobile-menu-toggle"
+					aria-expanded="false"
+					aria-controls="navigation"
+				>
+					Menu
+				</button>
+
+				<nav class="ho-header__navigation" id="navigation">
+					<ul class="ho-header__navigation-list">
+						<li class="ho-header__navigation-item">
+							<a href="/track" class="ho-header__navigation-link">Track</a>
+						</li>
+						<li class="ho-header__navigation-item">
+							<a
+								href="/visualize"
+								class="ho-header__navigation-link ho-header__navigation-link--active"
+								>Visualize</a
+							>
+						</li>
+						<li class="ho-header__navigation-item">
+							<a href="/journal" class="ho-header__navigation-link">Journal</a>
+						</li>
+					</ul>
+				</nav>
+			</div>
+		</header>
+
+		<!-- Main content area -->
+		<main class="ho-main">
+			<div class="ho-width-container">
+				<div class="ho-grid-row">
+					<div class="ho-grid-column-full">
+						<h1 class="ho-heading-xl">Visualize Your Pain Data</h1>
+						<p class="ho-body-l">
+							See patterns in your pain data to better understand your
+							condition.
+						</p>
+					</div>
+				</div>
+
+				<div class="ho-grid-row">
+					<div class="ho-grid-column-full">
+						<!-- Time range selector -->
+						<div class="time-range-selector">
+							<h2 class="ho-heading-m">Select Time Range</h2>
+							<div class="ho-form-group">
+								<div class="button-group time-range-buttons">
+									<button
+										class="ho-button ho-button--secondary time-btn"
+										data-range="week"
+									>
+										Last Week
+									</button>
+									<button
+										class="ho-button ho-button--secondary time-btn"
+										data-range="month"
+									>
+										Last Month
+									</button>
+									<button
+										class="ho-button ho-button--secondary time-btn active"
+										data-range="3months"
+									>
+										Last 3 Months
+									</button>
+									<button
+										class="ho-button ho-button--secondary time-btn"
+										data-range="year"
+									>
+										Last Year
+									</button>
+								</div>
+
+								<div class="custom-date-range">
+									<label class="ho-label" for="start-date">Custom Range:</label>
+									<div class="date-inputs">
+										<input
+											type="date"
+											id="start-date"
+											class="ho-input"
+											aria-label="Start date"
+										/>
+										<span class="to-separator">to</span>
+										<input
+											type="date"
+											id="end-date"
+											class="ho-input"
+											aria-label="End date"
+										/>
+										<button class="ho-button" id="apply-date-range">
+											Apply
+										</button>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- Pain visualization component will be rendered here -->
+				<div class="ho-grid-row">
+					<div class="ho-grid-column-full">
+						<div id="pain-visualization-root">
+							<div class="visualization-loading">
+								<p>Loading your pain visualizations...</p>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- Data insights section -->
+				<div class="ho-grid-row">
+					<div class="ho-grid-column-full">
+						<div class="insights-panel">
+							<h2 class="ho-heading-m">Data Insights</h2>
+							<div id="insights-content">
+								<p class="insights-loading">
+									Analyzing your data for insights...
+								</p>
+								<!-- Insights will be populated here by JavaScript -->
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="ho-grid-row">
+					<div class="ho-grid-column-full">
+						<div class="export-options">
+							<h2 class="ho-heading-m">Export Options</h2>
+							<div class="button-group">
+								<button class="ho-button ho-button--secondary" id="export-pdf">
+									Export as PDF
+								</button>
+								<button class="ho-button ho-button--secondary" id="export-csv">
+									Export as CSV
+								</button>
+								<button
+									class="ho-button ho-button--secondary"
+									id="share-doctor"
+								>
+									Share with Doctor
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="ho-grid-row">
+					<div class="ho-grid-column-full">
+						<div class="accessibility-features">
+							<h2 class="ho-heading-m">Accessibility Options</h2>
+							<div class="accessibility-controls">
+								<div class="control-group">
+									<label for="text-size" class="ho-label">Text Size</label>
+									<div class="button-group">
+										<button
+											class="ho-button ho-button--secondary text-size-btn"
+											data-size="small"
+										>
+											A
+										</button>
+										<button
+											class="ho-button ho-button--secondary text-size-btn"
+											data-size="medium"
+										>
+											AA
+										</button>
+										<button
+											class="ho-button ho-button--secondary text-size-btn"
+											data-size="large"
+										>
+											AAA
+										</button>
+									</div>
+								</div>
+
+								<div class="control-group">
+									<label for="contrast-mode" class="ho-label"
+										>Contrast Mode</label
+									>
+									<div class="button-group">
+										<button
+											class="ho-button ho-button--secondary contrast-btn"
+											data-contrast="normal"
+										>
+											Normal
+										</button>
+										<button
+											class="ho-button ho-button--secondary contrast-btn"
+											data-contrast="high"
+										>
+											High Contrast
+										</button>
+									</div>
+								</div>
+
+								<div class="control-group">
+									<button
+										class="ho-button ho-button--secondary"
+										id="read-aloud"
+									>
+										Read Aloud
+									</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</main>
+
+		<!-- Footer -->
+		<footer class="ho-footer">
+			<div class="ho-width-container">
+				<div class="ho-footer__meta">
+					<div class="ho-footer__meta-item">
+						<h2 class="ho-visually-hidden">Support links</h2>
+						<ul class="ho-footer__inline-list">
+							<li class="ho-footer__inline-list-item">
+								<a class="ho-footer__link" href="/accessibility"
+									>Accessibility</a
+								>
+							</li>
+							<li class="ho-footer__inline-list-item">
+								<a class="ho-footer__link" href="/privacy">Privacy policy</a>
+							</li>
+							<li class="ho-footer__inline-list-item">
+								<a class="ho-footer__link" href="/terms"
+									>Terms and conditions</a
+								>
+							</li>
+						</ul>
+						<div class="ho-footer__meta-custom">
+							<p class="ho-body-s">Developed by Janette Mujica-Zepeda</p>
+							<p class="ho-body-s">© 2025 CAFYP Project</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</footer>
+
+		<!-- JavaScript for mobile menu toggle and other interactions -->
+		<script src="js/main.js"></script>
+
+		<!-- React and Babel scripts -->
+		<script
+			src="https://unpkg.com/react@17/umd/react.development.js"
+			crossorigin
+		></script>
+		<script
+			src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"
+			crossorigin
+		></script>
+		<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+		<!-- Our React component entry point -->
+		<script type="text/babel" src="js/pain-visualization-entry.js"></script>
+
+		<!-- Setup accessibility features -->
+		<script>
+			document.addEventListener('DOMContentLoaded', () => {
+				// Text size buttons
+				const textSizeButtons = document.querySelectorAll('.text-size-btn');
+				textSizeButtons.forEach((button) => {
+					button.addEventListener('click', () => {
+						const size = button.dataset.size;
+						document.body.classList.remove(
+							'text-small',
+							'text-medium',
+							'text-large'
+						);
+						document.body.classList.add(`text-${size}`);
+
+						// Update active button
+						textSizeButtons.forEach((btn) => btn.classList.remove('active'));
+						button.classList.add('active');
+
+						// Save preference
+						localStorage.setItem('textSize', size);
+					});
+				});
+
+				// Contrast mode buttons
+				const contrastButtons = document.querySelectorAll('.contrast-btn');
+				contrastButtons.forEach((button) => {
+					button.addEventListener('click', () => {
+						const contrast = button.dataset.contrast;
+						document.body.classList.remove('high-contrast');
+						if (contrast === 'high') {
+							document.body.classList.add('high-contrast');
+						}
+
+						// Update active button
+						contrastButtons.forEach((btn) => btn.classList.remove('active'));
+						button.classList.add('active');
+
+						// Save preference
+						localStorage.setItem('contrastMode', contrast);
+					});
+				});
+
+				// Read aloud button
+				const readAloudButton = document.getElementById('read-aloud');
+				if (readAloudButton) {
+					readAloudButton.addEventListener('click', () => {
+						const readAloud = localStorage.getItem('readAloud') === 'true';
+						localStorage.setItem('readAloud', !readAloud);
+						readAloudButton.classList.toggle('active', !readAloud);
+
+						if (!readAloud) {
+							readAloudButton.textContent = 'Stop Reading Aloud';
+							// Read page content using text-to-speech
+							if (window.speechSynthesis) {
+								const mainContent = document.querySelector('main').textContent;
+								const speech = new SpeechSynthesisUtterance(mainContent);
+								window.speechSynthesis.speak(speech);
+							}
+						} else {
+							readAloudButton.textContent = 'Read Aloud';
+							if (window.speechSynthesis) {
+								window.speechSynthesis.cancel();
+							}
+						}
+					});
+				}
+
+				// Apply saved preferences
+				const savedTextSize = localStorage.getItem('textSize');
+				if (savedTextSize) {
+					document.body.classList.add(`text-${savedTextSize}`);
+					const activeTextButton = document.querySelector(
+						`.text-size-btn[data-size="${savedTextSize}"]`
+					);
+					if (activeTextButton) {
+						activeTextButton.classList.add('active');
+					}
+				}
+
+				const savedContrastMode = localStorage.getItem('contrastMode');
+				if (savedContrastMode === 'high') {
+					document.body.classList.add('high-contrast');
+					const activeContrastButton = document.querySelector(
+						'.contrast-btn[data-contrast="high"]'
+					);
+					if (activeContrastButton) {
+						activeContrastButton.classList.add('active');
+					}
+				}
+
+				const readAloud = localStorage.getItem('readAloud') === 'true';
+				if (readAloud && readAloudButton) {
+					readAloudButton.classList.add('active');
+					readAloudButton.textContent = 'Stop Reading Aloud';
+				}
+
+				// Time range buttons functionality
+				const timeRangeButtons = document.querySelectorAll('.time-btn');
+				timeRangeButtons.forEach((button) => {
+					button.addEventListener('click', () => {
+						// Update active button
+						timeRangeButtons.forEach((btn) => btn.classList.remove('active'));
+						button.classList.add('active');
+
+						// In a real app, this would trigger updating the charts
+						console.log('Time range selected:', button.dataset.range);
+					});
+				});
+
+				// Date range picker functionality
+				const applyDateRangeButton =
+					document.getElementById('apply-date-range');
+				if (applyDateRangeButton) {
+					applyDateRangeButton.addEventListener('click', () => {
+						const startDate = document.getElementById('start-date').value;
+						const endDate = document.getElementById('end-date').value;
+
+						if (startDate && endDate) {
+							// Remove active class from time buttons
+							timeRangeButtons.forEach((btn) => btn.classList.remove('active'));
+
+							// In a real app, this would trigger updating the charts
+							console.log('Custom date range:', { startDate, endDate });
+						}
+					});
+				}
+			});
+		</script>
+	</body>
+</html>

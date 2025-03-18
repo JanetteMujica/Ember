@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>
+			Ember - A digital assistant designed to empower people living with chronic
+			pain.
+		</title>
+		<meta
+			name="description"
+			content="A digital assistant to help track and manage chronic pain"
+		/>
+		<meta name="theme-color" content="#000000" />
+
+		{{content-for "head"}}
+
+		<link rel="icon" href="{{rootURL}}assets/favicon.ico" />
+		<link
+			rel="stylesheet"
+			href="{{rootURL}}assets/css/govuk-mobile-first.css"
+		/>
+		<link rel="stylesheet" href="{{rootURL}}assets/vendor.css" />
+		<link rel="stylesheet" href="{{rootURL}}assets/ember.css" />
+
+		{{content-for "head-footer"}}
+	</head>
+	<body>
+		{{content-for "body"}}
+
+		<!-- Application content will be injected here by Ember -->
+		<div id="ember-app"></div>
+
+		<script src="{{rootURL}}assets/vendor.js"></script>
+		<script src="{{rootURL}}assets/ember.js"></script>
+		<script src="{{rootURL}}js/main.js"></script>
+
+		{{content-for "body-footer"}}
+	</body>
+</html>

@@ -1,0 +1,428 @@
+/* PainVisualization Component Styles */
+
+.pain-visualization {
+	background-color: #ffffff;
+	border-radius: 8px;
+	box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+	margin: 20px 0;
+	max-width: 100%;
+	padding: 20px;
+	width: 100%;
+}
+
+/* Section titles */
+.section-title {
+	border-bottom: 2px solid #1d70b8;
+	color: #0b0c0c;
+	font-size: 1.5rem;
+	margin-bottom: 20px;
+	padding-bottom: 10px;
+}
+
+/* Time range controls */
+.time-range-controls {
+	margin-bottom: 30px;
+}
+
+.range-buttons {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+	margin-bottom: 20px;
+}
+
+.range-button {
+	background-color: #f3f3f3;
+	border: 1px solid #d9d9d9;
+	border-radius: 4px;
+	color: #0b0c0c;
+	cursor: pointer;
+	font-size: 1rem;
+	padding: 10px 15px;
+	transition: background-color 0.2s, transform 0.1s;
+}
+
+.range-button:hover {
+	background-color: #e1e1e1;
+}
+
+.range-button.active {
+	background-color: #1d70b8;
+	color: white;
+	border-color: #1d70b8;
+}
+
+.custom-date-range {
+	display: flex;
+	flex-direction: column;
+	margin-top: 15px;
+}
+
+.date-label {
+	font-weight: 600;
+	margin-bottom: 10px;
+}
+
+.date-inputs {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 10px;
+}
+
+.date-input {
+	border: 1px solid #d9d9d9;
+	border-radius: 4px;
+	font-size: 1rem;
+	padding: 10px;
+}
+
+.date-separator {
+	color: #505a5f;
+	font-weight: 600;
+}
+
+.apply-date-button {
+	background-color: #00703c;
+	border: none;
+	border-radius: 4px;
+	color: white;
+	cursor: pointer;
+	font-size: 1rem;
+	padding: 10px 15px;
+	transition: background-color 0.2s;
+}
+
+.apply-date-button:hover {
+	background-color: #005a30;
+}
+
+.apply-date-button:disabled {
+	background-color: #dddddd;
+	color: #666666;
+	cursor: not-allowed;
+}
+
+/* Charts container */
+.charts-container {
+	margin-bottom: 30px;
+}
+
+.chart-row {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 20px;
+	margin-bottom: 20px;
+}
+
+.chart-card {
+	background-color: #f8f8f8;
+	border-radius: 8px;
+	box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+	flex: 1;
+	min-width: 300px;
+	overflow: hidden;
+	padding: 15px;
+}
+
+.chart-title {
+	color: #0b0c0c;
+	font-size: 1.2rem;
+	margin-bottom: 15px;
+	text-align: center;
+}
+
+.chart-placeholder {
+	background-color: white;
+	border: 1px solid #e1e1e1;
+	border-radius: 4px;
+	height: 300px;
+	position: relative;
+	width: 100%;
+}
+
+/* Mock chart styles for demo purposes */
+.mock-line-chart,
+.mock-bar-chart,
+.mock-scatter-plot {
+	height: 100%;
+	position: relative;
+	width: 100%;
+}
+
+.mock-axis-x,
+.mock-axis-y {
+	color: #505a5f;
+	display: flex;
+	font-size: 0.8rem;
+	position: absolute;
+}
+
+.mock-axis-y {
+	flex-direction: column;
+	height: 80%;
+	justify-content: space-between;
+	left: 5px;
+	top: 10%;
+}
+
+.mock-axis-x {
+	bottom: 5px;
+	justify-content: space-between;
+	left: 10%;
+	width: 80%;
+}
+
+.mock-chart-area {
+	background-color: rgba(29, 112, 184, 0.05);
+	border-left: 1px solid #d9d9d9;
+	border-bottom: 1px solid #d9d9d9;
+	height: 80%;
+	left: 10%;
+	position: absolute;
+	top: 10%;
+	width: 80%;
+}
+
+.mock-data-point {
+	background-color: #1d70b8;
+	border-radius: 50%;
+	height: 8px;
+	position: absolute;
+	top: 0;
+	transform: translate(-50%, -50%);
+	width: 8px;
+}
+
+.mock-bar {
+	background-color: #1d70b8;
+	bottom: 0;
+	position: absolute;
+}
+
+.bar-label {
+	bottom: -25px;
+	color: #505a5f;
+	font-size: 0.7rem;
+	left: 50%;
+	position: absolute;
+	transform: translateX(-50%) rotate(-45deg);
+	white-space: nowrap;
+}
+
+.mock-scatter-point {
+	background-color: #1d70b8;
+	border-radius: 50%;
+	height: 8px;
+	position: absolute;
+	transform: translate(-50%, 50%);
+	width: 8px;
+}
+
+.mood-point {
+	background-color: #00703c;
+}
+
+/* Loading and no data states */
+.loading-container,
+.no-data-container {
+	align-items: center;
+	display: flex;
+	flex-direction: column;
+	height: 300px;
+	justify-content: center;
+	text-align: center;
+	width: 100%;
+}
+
+/* Insights section */
+.insights-section {
+	margin-bottom: 30px;
+}
+
+.insights-content {
+	background-color: #f8f8f8;
+	border-left: 4px solid #1d70b8;
+	border-radius: 0 4px 4px 0;
+	padding: 15px;
+}
+
+.insights-list {
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+}
+
+.insight-item {
+	border-bottom: 1px solid #e1e1e1;
+	margin-bottom: 10px;
+	padding-bottom: 10px;
+}
+
+.insight-item:last-child {
+	border-bottom: none;
+	margin-bottom: 0;
+	padding-bottom: 0;
+}
+
+.insights-loading {
+	color: #505a5f;
+	font-style: italic;
+}
+
+/* Export section */
+.export-section {
+	margin-bottom: 20px;
+}
+
+.export-buttons {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+}
+
+.export-button {
+	background-color: #f3f3f3;
+	border: 1px solid #d9d9d9;
+	border-radius: 4px;
+	color: #0b0c0c;
+	cursor: pointer;
+	font-size: 1rem;
+	padding: 10px 15px;
+	transition: background-color 0.2s;
+}
+
+.export-button:hover {
+	background-color: #e1e1e1;
+}
+
+/* Accessibility enhancements */
+.text-small .pain-visualization {
+	font-size: 0.9rem;
+}
+
+.text-medium .pain-visualization {
+	font-size: 1rem;
+}
+
+.text-large .pain-visualization {
+	font-size: 1.2rem;
+}
+
+.high-contrast .pain-visualization {
+	background-color: #000;
+	color: #fff;
+}
+
+.high-contrast .section-title {
+	border-bottom-color: #fff;
+	color: #fff;
+}
+
+.high-contrast .chart-card,
+.high-contrast .insights-content {
+	background-color: #333;
+	color: #fff;
+}
+
+.high-contrast .chart-title {
+	color: #fff;
+}
+
+.high-contrast .chart-placeholder {
+	background-color: #222;
+	border-color: #fff;
+}
+
+.high-contrast .mock-axis-x,
+.high-contrast .mock-axis-y,
+.high-contrast .bar-label {
+	color: #fff;
+}
+
+.high-contrast .mock-chart-area {
+	background-color: rgba(255, 255, 255, 0.1);
+	border-color: #fff;
+}
+
+.high-contrast .mock-data-point,
+.high-contrast .mock-bar,
+.high-contrast .mock-scatter-point {
+	background-color: #fff;
+}
+
+.high-contrast .mood-point {
+	background-color: #00ff00;
+}
+
+.high-contrast .range-button,
+.high-contrast .export-button {
+	background-color: #333;
+	border-color: #fff;
+	color: #fff;
+}
+
+.high-contrast .range-button.active {
+	background-color: #fff;
+	color: #000;
+}
+
+.high-contrast .date-input {
+	background-color: #000;
+	border-color: #fff;
+	color: #fff;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+	.chart-row {
+		flex-direction: column;
+	}
+
+	.chart-card {
+		margin-bottom: 20px;
+		width: 100%;
+	}
+
+	.date-inputs {
+		flex-direction: column;
+		align-items: flex-start;
+	}
+
+	.date-input {
+		width: 100%;
+	}
+
+	.apply-date-button {
+		margin-top: 10px;
+		width: 100%;
+	}
+
+	.range-buttons,
+	.export-buttons {
+		flex-direction: column;
+	}
+
+	.range-button,
+	.export-button {
+		width: 100%;
+	}
+}
+
+@media (max-width: 480px) {
+	.pain-visualization {
+		padding: 15px;
+	}
+
+	.section-title {
+		font-size: 1.3rem;
+	}
+
+	.chart-title {
+		font-size: 1.1rem;
+	}
+
+	.chart-placeholder {
+		height: 250px;
+	}
+}

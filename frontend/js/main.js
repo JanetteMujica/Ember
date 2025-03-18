@@ -1,106 +1,141 @@
-// CAFYP main JavaScript file
+/**
+ * main.js
+ *
+ * Common JavaScript functionality for the Ember application
+ */
 
-document.addEventListener('DOMContentLoaded', function () {
-	// Mobile navigation toggle functionality
-	const setupMobileNav = () => {
-		// The menu button is now in the HTML, we just need to add the event listener
-		const mobileMenuBtn = document.querySelector('.mobile-menu-toggle');
-		const nav = document.querySelector('.ho-header__navigation');
+document.addEventListener('DOMContentLoaded', () => {
+	// Mobile menu toggle
+	initMobileMenu();
 
-		if (!mobileMenuBtn || !nav) return;
-
-		// Hide the navigation by default on mobile
-		if (window.innerWidth < 768) {
-			nav.style.display = 'none';
-		}
-
-		// Toggle navigation on button click
-		mobileMenuBtn.addEventListener('click', function () {
-			const expanded = this.getAttribute('aria-expanded') === 'true';
-			const newExpandedState = !expanded;
-
-			this.setAttribute('aria-expanded', newExpandedState);
-			nav.style.display = newExpandedState ? 'block' : 'none';
-			this.innerHTML = newExpandedState ? 'Close' : 'Menu';
-		});
-	};
-
-	// Call the function when the DOM loads
-	setupMobileNav();
-
-	// Re-initialize on window resize
-	window.addEventListener('resize', function () {
-		const nav = document.querySelector('.ho-header__navigation');
-		const mobileMenuBtn = document.querySelector('.mobile-menu-toggle');
-
-		// Reset navigation display on larger screens
-		if (window.innerWidth >= 768) {
-			if (nav) nav.style.display = 'flex';
-		} else {
-			if (nav && mobileMenuBtn) {
-				// On small screens, display depends on menu state
-				const isExpanded =
-					mobileMenuBtn.getAttribute('aria-expanded') === 'true';
-				nav.style.display = isExpanded ? 'block' : 'none';
-			}
-		}
-	});
-
-	// Example: Add placeholder chart to the visualization area
-	const setupPlaceholderChart = () => {
-		const chartContainer = document.getElementById('pain-chart');
-		if (!chartContainer) return;
-
-		// If Chart.js is loaded, create a simple chart
-		if (typeof Chart !== 'undefined') {
-			new Chart(chartContainer, {
-				type: 'line',
-				data: {
-					labels: [
-						'Monday',
-						'Tuesday',
-						'Wednesday',
-						'Thursday',
-						'Friday',
-						'Saturday',
-						'Sunday',
-					],
-					datasets: [
-						{
-							label: 'Pain Level',
-							data: [3, 5, 2, 6, 4, 3, 5],
-							borderColor: '#65CDE3',
-							backgroundColor: 'rgba(101, 205, 227, 0.2)',
-							fill: true,
-							tension: 0.1,
-						},
-					],
-				},
-				options: {
-					responsive: true,
-					plugins: {
-						title: {
-							display: true,
-							text: 'Weekly Pain Level Tracking',
-						},
-					},
-					scales: {
-						y: {
-							min: 0,
-							max: 10,
-							title: {
-								display: true,
-								text: 'Pain Intensity (0-10)',
-							},
-						},
-					},
-				},
-			});
-		}
-	};
-
-	// Initialize any charts if the visualization page is being displayed
-	if (document.getElementById('pain-chart')) {
-		setupPlaceholderChart();
-	}
+	// Check for saved accessibility preferences and apply them
+	applyAccessibilityPreferences();
 });
+
+/**
+ * Initialize mobile menu functionality
+ */
+function initMobileMenu() {
+	const menuToggle = document.querySelector('.mobile-menu-toggle');
+	const navigation = document.getElementById('navigation');
+
+	if (menuToggle && navigation) {
+		menuToggle.addEventListener('click', () => {
+			const expanded =
+				menuToggle.getAttribute('aria-expanded') === 'true' || false;
+
+			menuToggle.setAttribute('aria-expanded', !expanded);
+			navigation.classList.toggle('is-open', !expanded);
+
+			if (!expanded) {
+				menuToggle.textContent = 'Close';
+			} else {
+				menuToggle.textContent = 'Menu';
+			}
+		});
+	}
+}
+
+/**
+ * Apply saved accessibility preferences
+ */
+function applyAccessibilityPreferences() {
+	// Apply text size preference
+	const savedTextSize = localStorage.getItem('textSize');
+	if (savedTextSize) {
+		document.body.classList.add(`text-${savedTextSize}`);
+	}
+
+	// Apply contrast mode preference
+	if (localStorage.getItem('contrastMode') === 'high') {
+		document.body.classList.add('high-contrast');
+	}
+}
+
+/**
+ * Function to create a downloadable file from a Blob
+ *
+ * @param {Blob} blob - The file data as a Blob
+ * @param {string} filename - The name to give the downloaded file
+ */
+function downloadFile(blob, filename) {
+	const url = window.URL.createObjectURL(blob);
+	const a = document.createElement('a');
+	a.style.display = 'none';
+	a.href = url;
+	a.download = filename;
+	document.body.appendChild(a);
+	a.click();
+	window.URL.revokeObjectURL(url);
+	document.body.removeChild(a);
+}
+
+/**
+ * Format date to a human-readable string
+ *
+ * @param {Date} date - The date to format
+ * @param {string} format - The format to use ('short', 'medium', 'long')
+ * @returns {string} - Formatted date string
+ */
+function formatDate(date, format = 'medium') {
+	if (!(date instanceof Date)) {
+		date = new Date(date);
+	}
+
+	const options = {
+		short: { month: 'numeric', day: 'numeric', year: '2-digit' },
+		medium: { month: 'short', day: 'numeric', year: 'numeric' },
+		long: { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' },
+	};
+
+	return date.toLocaleDateString(undefined, options[format] || options.medium);
+}
+
+/**
+ * Get relative time string (e.g., "2 days ago", "in 3 hours")
+ *
+ * @param {Date|string} date - The date to format
+ * @returns {string} - Relative time string
+ */
+function getRelativeTimeString(date) {
+	if (!(date instanceof Date)) {
+		date = new Date(date);
+	}
+
+	const now = new Date();
+	const diffInMs = date.getTime() - now.getTime();
+	const diffInSec = Math.round(diffInMs / 1000);
+	const diffInMin = Math.round(diffInSec / 60);
+	const diffInHour = Math.round(diffInMin / 60);
+	const diffInDay = Math.round(diffInHour / 24);
+
+	if (Math.abs(diffInSec) < 60) {
+		return diffInSec >= 0 ? 'just now' : 'just now';
+	} else if (Math.abs(diffInMin) < 60) {
+		return diffInMin > 0
+			? `in ${diffInMin} minute${diffInMin !== 1 ? 's' : ''}`
+			: `${Math.abs(diffInMin)} minute${
+					Math.abs(diffInMin) !== 1 ? 's' : ''
+			  } ago`;
+	} else if (Math.abs(diffInHour) < 24) {
+		return diffInHour > 0
+			? `in ${diffInHour} hour${diffInHour !== 1 ? 's' : ''}`
+			: `${Math.abs(diffInHour)} hour${
+					Math.abs(diffInHour) !== 1 ? 's' : ''
+			  } ago`;
+	} else if (Math.abs(diffInDay) < 30) {
+		return diffInDay > 0
+			? `in ${diffInDay} day${diffInDay !== 1 ? 's' : ''}`
+			: `${Math.abs(diffInDay)} day${Math.abs(diffInDay) !== 1 ? 's' : ''} ago`;
+	} else {
+		return formatDate(date);
+	}
+}
+
+// Export common utility functions for use in other scripts
+window.Ember = window.Ember || {};
+window.Ember.utils = {
+	downloadFile,
+	formatDate,
+	getRelativeTimeString,
+};
