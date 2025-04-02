@@ -1,0 +1,72 @@
+/* src/styles/components/buttons.css */
+
+/* Button component */
+.ho-button {
+	display: block;
+	width: 100%;
+	padding: var(--space-2) var(--space-2);
+	border: 0;
+	background-color: var(--color-blue-light);
+	color: var(--color-text-dark);
+	font-size: var(--font-size-16);
+	font-weight: 700;
+	line-height: 1.5;
+	text-align: center;
+	text-decoration: none;
+	cursor: pointer;
+	border-radius: 4px;
+	-webkit-appearance: none;
+	margin-right: 0;
+	margin-bottom: var(--space-3);
+	border: 3px solid var(--color-text-dark);
+}
+
+.ho-button:hover {
+	background-color: var(--color-primary-light);
+	color: var(--color-text-dark);
+	border-color: var(--color-bg-alt);
+}
+
+.ho-button:focus {
+	background-color: var(--color-blue-light);
+	outline: 3px solid var(--color-blue-light);
+	outline-offset: 3px;
+	box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.5);
+}
+
+.ho-button:active {
+	background-color: var(--color-blue-dark);
+	color: var(--color-text-light);
+	transform: translateY(1px);
+	box-shadow: 0 1px 0 var(--color-text-dark);
+}
+
+.ho-button--secondary {
+	background-color: var(--color-text-light);
+	color: var(--color-text-dark);
+	border: 3px solid var(--color-text-dark);
+	box-shadow: none;
+	border-radius: 4px;
+}
+
+.ho-button--secondary:hover {
+	background-color: var(--color-bg-dark);
+	color: var(--color-text-light);
+	border-color: var(--color-bg-alt);
+}
+
+.ho-button--secondary:focus {
+	background-color: var(--color-text-light);
+	color: var(--color-text-dark);
+	outline: 3px solid var(--color-blue-light);
+	outline-offset: 3px;
+}
+
+.ho-width-full {
+	width: 100%;
+}
+
+.button-group {
+	margin-top: var(--space-3);
+	margin-bottom: var(--space-3);
+}

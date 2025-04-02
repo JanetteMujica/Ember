@@ -1,0 +1,82 @@
+version: '3.1'
+
+rules:
+  - rule: Respond to greet intent from frontend
+    steps:
+      - intent: greet
+      - action: utter_greet
+
+  - rule: Say goodbye anytime the user says goodbye
+    steps:
+      - intent: goodbye
+      - action: utter_goodbye
+
+  - rule: Say 'I am a bot' anytime the user challenges
+    steps:
+      - intent: bot_challenge
+      - action: utter_iamabot
+
+  # Path 1: Track expression for visualization
+  - rule: Save tracking entry when user provides severity rating
+    steps:
+      - intent: rate_severity
+      - action: action_rate_severity
+      - action: action_save_tracking_entry
+      - action: utter_thank_you
+      - action: utter_main_options
+
+  # Path 2: Record medication event
+  - rule: Ask for medication details
+    steps:
+      - intent: medication_change
+      - action: action_save_medication_event
+
+  # Path 3: Record experiences in journal
+  - rule: Ask for experience details when user wants to record
+    steps:
+      - intent: record_experience
+      - action: action_save_experience
+
+  # Path for recording new symptom
+  - rule: Ask for symptom details when user reports new symptom
+    steps:
+      - intent: new_symptom
+      - action: action_save_new_symptom
+
+  # Path for recording other event
+  - rule: Ask for other event details
+    steps:
+      - intent: record_event
+      - action: utter_record_event_options
+
+  # Use a central router for all inform intents to prevent conflicts
+  - rule: Route inform intent based on requested slot
+    steps:
+      - intent: inform
+      - action: action_inform_router
+
+  # Handle additional category selection - fixed to avoid conflicts
+  - rule: Handle tracking preferences saved
+    steps:
+      - action: action_save_tracking_preferences
+      - action: utter_ask_add_another_category
+      
+  # Rule for custom category prompt
+  - rule: Ask for custom category details
+    steps:
+      - intent: add_custom_category
+      - action: action_add_custom_category
+
+  # Journal entry rules
+  - rule: Ask for journal content
+    steps:
+      - intent: create_journal_entry
+      - action: action_save_journal_entry
+
+  # Category updating rules
+  - rule: Get current categories
+    steps:
+      - intent: update_categories
+      - action: action_get_current_categories
+      - action: utter_current_categories
+      - action: utter_ask_update_action

@@ -1,0 +1,1122 @@
+/* src/styles/pages/visualize.css */
+
+/* Main content container */
+.visualize-content {
+	padding: var(--space-4) 0;
+	min-height: 80vh;
+	background-color: var(--color-primary-bg);
+}
+
+/* Use ho-width-container class from layout.css instead of redefining container */
+/* .ho-width-container is already defined in layout.css */
+
+/* Page title and intro */
+.visualize-page h1 {
+	font-size: var(--font-size-32);
+	color: var(--color-text-dark);
+	margin-bottom: var(--space-3);
+	font-weight: 600;
+}
+
+.high-contrast .visualize-page h1 {
+	color: var(--color-text-light);
+}
+
+.intro-text {
+	font-size: var(--font-size-19);
+	color: var(--color-text-dark);
+	max-width: 800px;
+	margin-bottom: var(--space-4);
+	line-height: 1.5;
+}
+
+.high-contrast .intro-text {
+	color: #ccc;
+}
+
+/* Accessibility Controls */
+.accessibility-controls {
+	background-color: #f5f5f5;
+	padding: var(--space-4);
+	border-radius: 8px;
+	margin-bottom: var(--space-4);
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.high-contrast .accessibility-controls {
+	background-color: #222;
+	border: 1px solid #444;
+}
+
+.accessibility-controls h2 {
+	margin-top: 0;
+	margin-bottom: var(--space-3);
+	font-size: var(--font-size-24);
+	color: var(--color-text-dark);
+}
+
+.high-contrast .accessibility-controls h2 {
+	color: #ccc;
+}
+
+.accessibility-options {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--space-4);
+}
+
+.accessibility-option {
+	display: flex;
+	align-items: center;
+	gap: var(--space-2);
+	cursor: pointer;
+	user-select: none;
+}
+
+.accessibility-option input[type='checkbox'] {
+	width: 24px;
+	height: 24px;
+	cursor: pointer;
+}
+
+.accessibility-option label {
+	font-size: var(--font-size-16);
+	color: var(--color-text-dark);
+	font-weight: 600;
+}
+
+.high-contrast .accessibility-option label {
+	color: #ccc;
+}
+
+/* Status Message */
+.status-message {
+	padding: var(--space-3);
+	border-radius: 6px;
+	margin-bottom: var(--space-4);
+	font-size: var(--font-size-16);
+	font-weight: 600;
+	text-align: center;
+}
+
+.status-message.success {
+	background-color: rgba(39, 174, 96, 0.1);
+	color: #27ae60;
+	border: 1px solid #27ae60;
+}
+
+.status-message.error {
+	background-color: rgba(231, 76, 60, 0.1);
+	color: #e74c3c;
+	border: 1px solid #e74c3c;
+}
+
+.high-contrast .status-message.success {
+	background-color: #27ae60;
+	color: #fff;
+}
+
+.high-contrast .status-message.error {
+	background-color: #e74c3c;
+	color: #fff;
+}
+
+/* Controls for data selection - with larger touch targets */
+.visualization-controls {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--space-4);
+	margin-bottom: var(--space-4);
+	padding: var(--space-4);
+	background-color: #f5f5f5;
+	border-radius: 8px;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.high-contrast .visualization-controls {
+	background-color: #222;
+	border: 1px solid #444;
+}
+
+.control-group {
+	display: flex;
+	flex-direction: column;
+	min-width: 200px;
+	flex: 1;
+}
+
+.control-group label {
+	margin-bottom: var(--space-2);
+	font-weight: 600;
+	color: var(--color-text-dark);
+	font-size: var(--font-size-16);
+}
+
+.high-contrast .control-group label {
+	color: #ccc;
+}
+
+.category-select,
+.time-range-select {
+	padding: var(--space-3); /* Increased padding for better touch target */
+	border: 2px solid #ccc;
+	border-radius: 6px;
+	font-size: var(--font-size-16);
+	background-color: #fff;
+	color: #333;
+	transition: border-color 0.2s;
+	height: 44px; /* Minimum touch target size */
+}
+
+.category-select:focus,
+.time-range-select:focus {
+	border-color: #2196f3;
+	outline: none;
+	box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2);
+}
+
+.high-contrast .category-select,
+.high-contrast .time-range-select {
+	background-color: #111;
+	color: #fff;
+	border-color: #555;
+}
+
+.high-contrast .category-select:focus,
+.high-contrast .time-range-select:focus {
+	border-color: #fff;
+	box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3);
+}
+
+.simplified-ui .category-select,
+.simplified-ui .time-range-select {
+	padding: var(--space-3) var(--space-3);
+	font-size: var(--font-size-19);
+	height: 50px; /* Even larger for simplified UI */
+}
+
+/* Container for the visualization component */
+.visualization-container {
+	width: 100%;
+	margin-bottom: var(--space-5);
+	background-color: #fff;
+	padding: var(--space-4);
+	border-radius: 8px;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.high-contrast .visualization-container {
+	background-color: #000;
+	border: 1px solid #444;
+}
+
+/* Loading indicator */
+.loading-indicator {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 200px;
+	font-size: var(--font-size-19);
+	color: var(--color-text-dark);
+}
+
+.high-contrast .loading-indicator {
+	color: #ccc;
+}
+
+/* No data message */
+.no-data-message {
+	text-align: center;
+	padding: var(--space-4);
+	background-color: #f8f8f8;
+	border-radius: 8px;
+	margin: var(--space-4) 0;
+	border-left: 4px solid #2196f3;
+}
+
+.high-contrast .no-data-message {
+	background-color: #222;
+	border-left-color: #fff;
+}
+
+.no-data-message p {
+	margin-bottom: var(--space-3);
+	font-size: var(--font-size-19);
+	color: var(--color-text-dark);
+}
+
+.high-contrast .no-data-message p {
+	color: #ccc;
+}
+
+/* Button style aligned with journal page */
+.button {
+	display: inline-block;
+	padding: var(--space-3) var(--space-4);
+	min-height: 44px; /* Minimum touch target size */
+	background-color: var(--color-blue-light);
+	color: var(--color-text-dark);
+	border-radius: 4px;
+	text-decoration: none;
+	font-weight: 600;
+	font-size: var(--font-size-16);
+	transition: background-color 0.2s;
+	border: 3px solid var(--color-text-dark);
+	cursor: pointer;
+	text-align: center;
+}
+
+.button:hover {
+	background-color: var(--color-primary);
+	color: var(--color-text-light);
+	border-color: var(--color-bg-alt);
+}
+
+.button:focus {
+	outline: 3px solid var(--color-blue-light);
+	outline-offset: 3px;
+	box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.5);
+}
+
+.high-contrast .button {
+	background-color: #fff;
+	color: #000;
+	border-color: #000;
+}
+
+.high-contrast .button:hover {
+	background-color: #ddd;
+}
+
+.high-contrast .button:focus {
+	box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.6);
+}
+
+/* Journal section */
+.journal-section {
+	margin: var(--space-5) 0;
+	padding: var(--space-4);
+	background-color: #f9f9f9;
+	border-radius: 8px;
+	border-left: 4px solid var(--color-primary);
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.high-contrast .journal-section {
+	background-color: #222;
+	border-left-color: #fff;
+}
+
+.journal-section h2 {
+	color: var(--color-text-dark);
+	margin-top: 0;
+	margin-bottom: var(--space-2);
+	font-size: var(--font-size-24);
+}
+
+.high-contrast .journal-section h2 {
+	color: #fff;
+}
+
+.journal-section p {
+	color: var(--color-text-dark);
+	font-size: var(--font-size-16);
+	line-height: 1.6;
+	margin-bottom: var(--space-3);
+}
+
+.high-contrast .journal-section p {
+	color: #ccc;
+}
+
+.journal-form {
+	margin-top: var(--space-3);
+}
+
+.journal-textarea {
+	width: 100%;
+	min-height: 120px;
+	padding: var(--space-3);
+	border: 2px solid #ddd;
+	border-radius: 6px;
+	font-family: inherit;
+	font-size: var(--font-size-16);
+	resize: vertical;
+	margin-bottom: var(--space-3);
+	transition: border-color 0.2s;
+}
+
+.journal-textarea:focus {
+	border-color: var(--color-primary);
+	outline: none;
+	box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
+.high-contrast .journal-textarea {
+	background-color: #111;
+	color: #fff;
+	border-color: #444;
+}
+
+.high-contrast .journal-textarea:focus {
+	border-color: #fff;
+	box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3);
+}
+
+.simplified-ui .journal-textarea {
+	font-size: var(--font-size-19);
+	padding: var(--space-4);
+	min-height: 150px;
+}
+
+.submit-button {
+	padding: var(--space-3) var(--space-4);
+	min-height: 44px; /* Minimum touch target size */
+	min-width: 120px; /* Ensure button is wide enough */
+	background-color: var(--color-blue-light);
+	color: var(--color-text-dark);
+	border: none;
+	border-radius: 4px;
+	font-size: var(--font-size-16);
+	font-weight: 600;
+	cursor: pointer;
+	transition: background-color 0.2s;
+	border: 3px solid var(--color-text-dark);
+}
+
+.submit-button:hover {
+	background-color: var(--color-primary);
+	color: var(--color-text-light);
+	border-color: var(--color-bg-alt);
+}
+
+.submit-button:focus {
+	outline: 3px solid var(--color-blue-light);
+	outline-offset: 3px;
+	box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.5);
+}
+
+.submit-button:disabled {
+	background-color: #ccc;
+	cursor: not-allowed;
+	border-color: #999;
+}
+
+.high-contrast .submit-button {
+	background-color: #fff;
+	color: #000;
+	border-color: #000;
+}
+
+.high-contrast .submit-button:hover {
+	background-color: #ddd;
+}
+
+.high-contrast .submit-button:focus {
+	box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.6);
+}
+
+.high-contrast .submit-button:disabled {
+	background-color: #444;
+	color: #aaa;
+	border-color: #777;
+}
+
+.simplified-ui .submit-button {
+	font-size: var(--font-size-19);
+	padding: var(--space-3) var(--space-4);
+	min-height: 50px;
+}
+
+/* Navigation links */
+.navigation-links {
+	display: flex;
+	gap: var(--space-3);
+	margin-top: var(--space-4);
+	margin-bottom: var(--space-4);
+}
+
+/* Align navigation links with journal page */
+.nav-link {
+	display: block;
+	flex: 1;
+	padding: var(--space-3) var(--space-2);
+	min-height: 44px; /* Minimum touch target size */
+	background-color: var(--color-blue-light);
+	color: var(--color-text-dark);
+	font-size: var(--font-size-16);
+	font-weight: 700;
+	line-height: 1.5;
+	text-align: center;
+	text-decoration: none;
+	cursor: pointer;
+	border-radius: 4px;
+	-webkit-appearance: none;
+	margin-right: 0;
+	border: 3px solid var(--color-text-dark);
+}
+
+.nav-link:hover {
+	background-color: var(--color-primary);
+	color: var(--color-text-light);
+	border-color: var(--color-bg-alt);
+	text-decoration: none;
+}
+
+.nav-link:focus {
+	background-color: var(--color-blue-light);
+	outline: 3px solid var(--color-blue-light);
+	outline-offset: 3px;
+	box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.5);
+}
+
+.high-contrast .nav-link {
+	background-color: #fff;
+	color: #000;
+	border-color: #000;
+}
+
+.high-contrast .nav-link:hover {
+	background-color: #ddd;
+	color: #000;
+}
+
+.high-contrast .nav-link:focus {
+	outline-color: #fff;
+	box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.6);
+}
+
+.simplified-ui .nav-link {
+	padding: var(--space-3);
+	font-size: var(--font-size-19);
+}
+
+/* Pain Visualization Component Styles */
+.pain-visualization {
+	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+	margin-bottom: var(--space-4);
+}
+
+/* Category toggle section */
+.category-toggles {
+	margin-bottom: var(--space-4);
+}
+
+.category-toggles h3 {
+	margin-bottom: var(--space-2);
+	font-size: var(--font-size-19);
+	color: var(--color-text-dark);
+}
+
+.high-contrast .category-toggles h3 {
+	color: #fff;
+}
+
+.toggle-buttons {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--space-2);
+}
+
+.toggle-button {
+	padding: var(--space-2) var(--space-3);
+	min-height: 44px; /* Minimum touch target size */
+	min-width: 80px; /* Ensure button is wide enough */
+	border: 2px solid #ced4da;
+	border-radius: 20px;
+	background-color: #f8f9fa;
+	color: #495057;
+	cursor: pointer;
+	transition: all 0.2s;
+	font-size: var(--font-size-16);
+	font-weight: 600;
+}
+
+.toggle-button.active {
+	background-color: var(--color-blue-light);
+	color: var(--color-text-dark);
+	border-color: var(--color-blue-dark);
+}
+
+.toggle-button.inactive {
+	background-color: #f8f9fa;
+	color: #6c757d;
+}
+
+.high-contrast .toggle-button {
+	border: 2px solid #fff;
+	background-color: #000;
+	color: #fff;
+}
+
+.high-contrast .toggle-button.active {
+	background-color: #fff;
+	color: #000;
+	border-color: #fff;
+}
+
+.high-contrast .toggle-button.inactive {
+	background-color: #333;
+	color: #ccc;
+	border-color: #666;
+}
+
+.simplified-ui .toggle-button {
+	font-size: var(--font-size-19);
+	padding: var(--space-3) var(--space-4);
+	min-height: 50px;
+}
+
+/* Histogram legend */
+.histogram-legend {
+	margin-bottom: var(--space-4);
+}
+
+.histogram-legend h3 {
+	margin-bottom: var(--space-2);
+	font-size: var(--font-size-19);
+	color: var(--color-text-dark);
+}
+
+.high-contrast .histogram-legend h3 {
+	color: #fff;
+}
+
+.legend-items {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--space-3);
+}
+
+.legend-item {
+	display: flex;
+	align-items: center;
+}
+
+.legend-color {
+	display: inline-block;
+	width: 24px;
+	height: 24px;
+	margin-right: var(--space-2);
+	border: 1px solid #ddd;
+	border-radius: 3px;
+}
+
+.high-contrast .legend-color {
+	border-color: #fff;
+}
+
+.legend-label {
+	font-size: var(--font-size-16);
+	color: var(--color-text-dark);
+}
+
+.high-contrast .legend-label {
+	color: #fff;
+}
+
+.simplified-ui .legend-label {
+	font-size: var(--font-size-19);
+}
+
+/* Histogram container */
+.histogram-container {
+	background-color: white;
+	border-radius: 8px;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+	padding: var(--space-4);
+	margin-bottom: var(--space-4);
+	overflow-x: auto;
+}
+
+.high-contrast .histogram-container {
+	background-color: #000;
+	border: 1px solid #444;
+}
+
+.histogram-chart {
+	min-width: 650px;
+}
+
+/* Histogram dates (X-axis) */
+.histogram-dates {
+	display: flex;
+	border-bottom: 1px solid #e1e4e8;
+	padding-left: 120px; /* Space for category labels */
+}
+
+.high-contrast .histogram-dates {
+	border-color: #666;
+}
+
+.date-label {
+	flex: 1;
+	text-align: center;
+	padding: var(--space-2);
+	font-size: var(--font-size-16);
+	color: var(--color-text-dark);
+	min-width: 60px;
+}
+
+.high-contrast .date-label {
+	color: #fff;
+}
+
+.simplified-ui .date-label {
+	font-size: var(--font-size-19);
+	padding: var(--space-3);
+}
+
+/* Histogram data (Y-axis and bars) */
+.histogram-data {
+	margin-top: var(--space-3);
+}
+
+.category-row {
+	display: flex;
+	margin-bottom: var(--space-3);
+	align-items: flex-end;
+}
+
+.category-label {
+	width: 120px;
+	font-weight: 600;
+	color: var(--color-text-dark);
+	padding-right: var(--space-2);
+	text-align: right;
+	font-size: var(--font-size-16);
+}
+
+.high-contrast .category-label {
+	color: #fff;
+}
+
+.simplified-ui .category-label {
+	font-size: var(--font-size-19);
+}
+
+.severity-bars {
+	display: flex;
+	flex: 1;
+}
+
+.date-cell {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	position: relative;
+	min-height: 120px;
+	min-width: 60px;
+	border-right: 1px dashed #f0f0f0;
+}
+
+.high-contrast .date-cell {
+	border-color: #444;
+}
+
+.severity-bar {
+	width: 30px;
+	background-color: var(--color-blue-light);
+	border-radius: 3px 3px 0 0;
+	color: var(--color-text-dark);
+	text-align: center;
+	font-weight: bold;
+	font-size: var(--font-size-16);
+	margin-top: auto;
+}
+
+.high-contrast .severity-bar {
+	border: 1px solid #fff;
+}
+
+.simplified-ui .severity-bar {
+	width: 40px;
+	font-size: var(--font-size-19);
+}
+
+.event-marker {
+	position: absolute;
+	bottom: -10px;
+	background-color: var(--color-primary);
+	color: var(--color-text-light);
+	width: 24px;
+	height: 24px;
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-weight: bold;
+	font-size: var(--font-size-16);
+	cursor: pointer;
+}
+
+.high-contrast .event-marker {
+	background-color: #fff;
+	color: #000;
+	border: 1px solid #000;
+}
+
+.simplified-ui .event-marker {
+	width: 30px;
+	height: 30px;
+	font-size: var(--font-size-19);
+}
+
+/* Events Timeline */
+.events-timeline {
+	background-color: white;
+	border-radius: 8px;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+	padding: var(--space-4);
+	margin-top: var(--space-4);
+}
+
+.high-contrast .events-timeline {
+	background-color: #000;
+	border: 1px solid #444;
+}
+
+.events-timeline h3 {
+	margin-bottom: var(--space-3);
+	font-size: var(--font-size-24);
+	color: var(--color-text-dark);
+}
+
+.high-contrast .events-timeline h3 {
+	color: #fff;
+}
+
+.simplified-ui .events-timeline h3 {
+	font-size: var(--font-size-27);
+}
+
+.timeline-entries {
+	max-height: 300px;
+	overflow-y: auto;
+	padding-right: var(--space-2);
+}
+
+/* Add larger scrollbar for easier use */
+.timeline-entries::-webkit-scrollbar {
+	width: 12px;
+}
+
+.timeline-entries::-webkit-scrollbar-track {
+	background: #f1f1f1;
+	border-radius: 6px;
+}
+
+.timeline-entries::-webkit-scrollbar-thumb {
+	background: #888;
+	border-radius: 6px;
+}
+
+.timeline-entries::-webkit-scrollbar-thumb:hover {
+	background: #555;
+}
+
+.high-contrast .timeline-entries::-webkit-scrollbar-track {
+	background: #333;
+}
+
+.high-contrast .timeline-entries::-webkit-scrollbar-thumb {
+	background: #fff;
+}
+
+.timeline-entry {
+	display: flex;
+	margin-bottom: var(--space-3);
+	padding-bottom: var(--space-3);
+	border-bottom: 1px solid #f0f0f0;
+}
+
+.high-contrast .timeline-entry {
+	border-color: #444;
+}
+
+.timeline-date {
+	width: 120px;
+	font-size: var(--font-size-16);
+	color: var(--color-text-dark);
+	font-weight: 600;
+}
+
+.high-contrast .timeline-date {
+	color: #ccc;
+}
+
+.simplified-ui .timeline-date {
+	font-size: var(--font-size-19);
+	width: 140px;
+}
+
+.timeline-content {
+	flex: 1;
+}
+
+.timeline-type {
+	font-weight: 600;
+	color: var(--color-text-dark);
+	margin-bottom: var(--space-1);
+	text-transform: capitalize;
+	font-size: var(--font-size-16);
+}
+
+.high-contrast .timeline-type {
+	color: #fff;
+}
+
+.simplified-ui .timeline-type {
+	font-size: var(--font-size-19);
+}
+
+.timeline-text {
+	font-size: var(--font-size-16);
+	color: var(--color-text-dark);
+	line-height: 1.5;
+}
+
+.high-contrast .timeline-text {
+	color: #ccc;
+}
+
+.simplified-ui .timeline-text {
+	font-size: var(--font-size-19);
+	line-height: 1.7;
+}
+
+/* Custom styling for high contrast mode */
+.high-contrast .visualize-content {
+	background-color: #000;
+	color: #fff;
+}
+
+.high-contrast .visualization-container {
+	border: 1px solid #555;
+}
+
+/* Accessibility enhancements */
+.simplified-ui .visualize-page h1 {
+	font-size: var(--font-size-36);
+	margin-bottom: var(--space-4);
+}
+
+.simplified-ui .intro-text {
+	font-size: var(--font-size-24);
+	line-height: 1.7;
+	margin-bottom: var(--space-5);
+}
+
+.simplified-ui .journal-section h2 {
+	font-size: var(--font-size-27);
+	margin-bottom: var(--space-3);
+}
+
+/* Print styles for sharing visualizations */
+@media print {
+	.visualize-content {
+		padding: 0;
+		background-color: #fff;
+	}
+
+	.ho-width-container {
+		width: 100%;
+		max-width: none;
+		padding: 0;
+	}
+
+	.navigation-links,
+	.visualization-controls,
+	.journal-section,
+	.accessibility-controls,
+	.status-message {
+		display: none !important;
+	}
+
+	.visualization-container {
+		box-shadow: none;
+		margin: 0;
+		page-break-inside: avoid;
+		border: none;
+	}
+
+	.visualize-page h1 {
+		font-size: 24pt;
+		text-align: center;
+		margin: 20px 0;
+	}
+
+	.intro-text {
+		text-align: center;
+		margin-bottom: 20px;
+		font-size: 12pt;
+	}
+
+	/* Ensure histogram prints properly */
+	.histogram-container {
+		width: 100%;
+		box-shadow: none;
+		border: 1px solid #ddd;
+	}
+
+	.category-toggles {
+		display: none !important;
+	}
+
+	.histogram-legend {
+		page-break-inside: avoid;
+	}
+
+	/* Add page numbers */
+	@page {
+		margin: 1cm;
+		@bottom-center {
+			content: 'Page ' counter(page) ' of ' counter(pages);
+		}
+	}
+
+	/* Add report title to the top of each page */
+	@page {
+		@top-center {
+			content: 'Ember Health Visualizations';
+			font-weight: bold;
+		}
+	}
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+	.visualize-content {
+		padding: var(--space-3) 0;
+	}
+
+	.visualize-page h1 {
+		font-size: var(--font-size-27);
+	}
+
+	.visualization-controls {
+		flex-direction: column;
+		gap: var(--space-3);
+	}
+
+	.control-group {
+		width: 100%;
+	}
+
+	.accessibility-options {
+		flex-direction: column;
+		gap: var(--space-2);
+	}
+
+	.navigation-links {
+		flex-direction: column;
+		gap: var(--space-3);
+	}
+
+	.nav-link {
+		display: block;
+		text-align: center;
+		width: 100%;
+	}
+
+	.journal-section {
+		padding: var(--space-3);
+	}
+
+	.journal-section h2 {
+		font-size: var(--font-size-21);
+	}
+
+	.toggle-buttons {
+		flex-direction: column;
+		gap: var(--space-2);
+	}
+
+	.toggle-button {
+		width: 100%;
+	}
+
+	.timeline-entry {
+		flex-direction: column;
+	}
+
+	.timeline-date {
+		width: 100%;
+		margin-bottom: var(--space-2);
+	}
+
+	.submit-button {
+		width: 100%;
+	}
+
+	.histogram-container {
+		padding: var(--space-2);
+	}
+
+	.histogram-legend {
+		margin-bottom: var(--space-3);
+	}
+
+	.legend-items {
+		flex-direction: column;
+		gap: var(--space-2);
+	}
+}
+
+@media (max-width: 480px) {
+	.visualize-content {
+		padding: var(--space-2) 0;
+	}
+
+	.visualize-page h1 {
+		font-size: var(--font-size-24);
+	}
+
+	.journal-section {
+		padding: var(--space-2);
+	}
+
+	.submit-button,
+	.button {
+		width: 100%;
+		padding: var(--space-2) 0;
+		text-align: center;
+	}
+
+	.visualization-controls {
+		padding: var(--space-2);
+	}
+
+	.control-group label {
+		font-size: var(--font-size-14);
+	}
+
+	.category-label {
+		width: 80px;
+		font-size: var(--font-size-14);
+	}
+
+	.histogram-dates {
+		padding-left: 80px;
+	}
+}
+
+/* Reduce motion */
+@media (prefers-reduced-motion: reduce) {
+	.toggle-button:hover,
+	.nav-link:hover,
+	.button:hover {
+		transform: none;
+	}
+
+	.submit-button:hover,
+	.button:active {
+		transform: none;
+	}
+
+	* {
+		transition: none !important;
+		animation: none !important;
+	}
+}

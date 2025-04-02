@@ -1,0 +1,111 @@
+version: '3.1'
+
+stories:
+  - story: initial greeting
+    steps:
+      - intent: greet
+      - action: utter_greet
+
+  - story: handle additional category flow
+    steps:
+      - action: action_save_tracking_preferences
+      - action: utter_ask_add_another_category
+      - intent: affirm # User wants to add another category
+      - action: action_handle_additional_category
+
+  - story: handle no more categories flow
+    steps:
+      - action: action_save_tracking_preferences
+      - action: utter_ask_add_another_category
+      - intent: deny # User doesn't want to add more categories
+      - action: action_handle_additional_category
+      - action: action_ask_track_now
+      - intent: affirm # User wants to track now
+      - action: action_start_tracking
+      
+  - story: deny tracking now
+    steps:
+      - action: action_ask_track_now
+      - intent: deny # User doesn't want to track now
+      - action: utter_main_options
+
+  - story: track daily life path
+    steps:
+      - intent: track_daily_life
+      - action: utter_track_daily_life_intro
+      - action: utter_tracking_categories
+      - intent: select_physical_health
+      - action: utter_physical_health_categories
+      - intent: select_tracking_category
+      - action: action_select_tracking_category
+      - intent: set_tracking_frequency
+      - action: action_set_tracking_frequency
+      - intent: set_tracking_time
+      - action: action_set_tracking_time
+
+  # Record paths that don't use inform intent
+  - story: record event path - medication
+    steps:
+      - intent: record_event
+      - action: utter_record_event_options
+      - intent: medication_change
+      - action: action_save_medication_event
+
+  - story: record event path - symptom
+    steps:
+      - intent: record_event
+      - action: utter_record_event_options
+      - intent: new_symptom
+      - action: action_save_new_symptom
+
+  # IMPORTANT: Remove this story since it conflicts with the rule!
+  # - story: record other event path
+  #   steps:
+  #     - intent: record_event
+  #     - action: utter_record_event_options
+  #     - intent: inform
+  #     - action: action_save_other_event
+
+  - story: view all categories
+    steps:
+      - intent: view_all_categories
+      - action: action_show_all_categories
+      - action: utter_tracking_categories
+
+  - story: get current categories
+    steps:
+      - intent: update_categories
+      - action: action_get_current_categories
+      - action: utter_current_categories
+      - action: utter_ask_update_action
+
+  - story: go to visualizations
+    steps:
+      - intent: view_visualizations
+      - action: action_redirect_to_visualize
+
+  - story: go to journal
+    steps:
+      - intent: go_to_journal
+      - action: action_redirect_to_journal
+
+  - story: create journal entry
+    steps:
+      - intent: create_journal_entry
+      - action: action_save_journal_entry
+
+  - story: help
+    steps:
+      - intent: help
+      - action: utter_help
+      - action: utter_main_options
+
+  - story: say goodbye
+    steps:
+      - intent: goodbye
+      - action: utter_goodbye
+
+  - story: bot challenge
+    steps:
+      - intent: bot_challenge
+      - action: utter_iamabot

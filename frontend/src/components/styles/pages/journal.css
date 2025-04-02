@@ -1,0 +1,922 @@
+/* src/components/styles/pages/journal.css */
+
+/* src/components/styles/pages/journal.css */
+
+/* Main content container */
+.journal-content {
+	padding: var(--space-4) 0;
+	min-height: 80vh;
+	background-color: var(--color-primary-bg);
+}
+
+/* Page title and intro */
+.journal-page h1 {
+	font-size: var(--font-size-32);
+	color: var(--color-text-dark);
+	margin-bottom: var(--space-3);
+	font-weight: 600;
+}
+
+.high-contrast .journal-page h1 {
+	color: var(--color-text-light);
+}
+
+.journal-intro {
+	font-size: var(--font-size-19);
+	color: var(--color-text-dark);
+	max-width: 800px;
+	margin-bottom: var(--space-4);
+	line-height: 1.5;
+}
+
+.high-contrast .journal-intro {
+	color: #ccc;
+}
+
+/* Journal container */
+.journal-container {
+	width: 100%;
+	background-color: #ffffff;
+	border-radius: 12px;
+	padding: var(--space-4);
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+	margin-bottom: var(--space-4);
+}
+
+.high-contrast .journal-container {
+	background-color: #000;
+	color: #fff;
+	border: 1px solid #444;
+}
+
+/* Filters section */
+.journal-filters {
+	width: 100%;
+	background-color: #f8f9fa;
+	border-radius: 10px;
+	padding: var(--space-4);
+	margin-bottom: var(--space-4);
+}
+
+.high-contrast .journal-filters {
+	background-color: #222;
+}
+
+.search-container {
+	margin-bottom: var(--space-3);
+}
+
+.search-input {
+	width: 100%;
+	padding: var(--space-3);
+	font-size: var(--font-size-16);
+	border: 2px solid #ddd;
+	border-radius: 8px;
+	transition: border-color 0.3s ease;
+}
+
+.search-input:focus {
+	outline: none;
+	border-color: var(--color-primary);
+	box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.3);
+}
+
+.high-contrast .search-input {
+	background-color: #333;
+	color: #fff;
+	border-color: #666;
+}
+
+.visually-hidden {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	border: 0;
+}
+
+/* Updated filter row layout with bigger touch targets */
+.filter-row {
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-3);
+	margin-bottom: var(--space-3);
+}
+
+.date-filter {
+	display: flex;
+	align-items: center;
+	flex-wrap: nowrap;
+	margin-bottom: var(--space-3);
+}
+
+.date-filter label {
+	margin-right: 0.5rem;
+	white-space: nowrap;
+	font-size: var(--font-size-16); /* Ensure readable font size */
+}
+
+.date-filter input[type='date'] {
+	flex: 1;
+	min-width: 120px;
+	max-width: 200px;
+	margin-right: 1rem;
+	padding: var(--space-3); /* Larger touch target */
+	height: 44px; /* Minimum touch target size */
+}
+
+.type-sort-row {
+	display: flex;
+	gap: var(--space-3);
+	width: 100%;
+}
+
+.type-filter,
+.sort-filter {
+	flex: 1;
+	min-width: 200px;
+}
+
+.journal-filters label {
+	display: inline-block;
+	margin-right: var(--space-1);
+	font-weight: 600;
+	color: var(--color-text-dark);
+	font-size: var(--font-size-16);
+}
+
+.high-contrast .journal-filters label {
+	color: #ccc;
+}
+
+.journal-filters input[type='date'],
+.journal-filters select {
+	padding: var(--space-3); /* Increased padding for better touch target */
+	border: 2px solid #ddd;
+	border-radius: 6px;
+	font-size: var(--font-size-16);
+	margin-right: var(--space-2);
+	margin-bottom: var(--space-1);
+	min-width: 140px;
+	height: 44px; /* Minimum touch target size */
+}
+
+.journal-filters input[type='date']:focus,
+.journal-filters select:focus {
+	outline: none;
+	border-color: var(--color-primary);
+	box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
+.high-contrast .journal-filters input[type='date'],
+.high-contrast .journal-filters select {
+	background-color: #333;
+	color: #fff;
+	border-color: #666;
+}
+
+/* Download buttons - increased size for better touch targets */
+.download-buttons {
+	display: flex;
+	gap: var(--space-3);
+	width: 100%;
+	margin-top: var(--space-3);
+	margin-bottom: var(--space-3);
+}
+
+/* Match ho-button style but with larger touch areas */
+.download-button {
+	display: block;
+	flex: 1;
+	padding: var(--space-3) var(--space-2); /* Increased vertical padding */
+	min-height: 44px; /* Minimum touch target size */
+	border: 0;
+	background-color: var(--color-blue-light);
+	color: var(--color-text-dark);
+	font-size: var(--font-size-16);
+	font-weight: 700;
+	line-height: 1.5;
+	text-align: center;
+	text-decoration: none;
+	cursor: pointer;
+	border-radius: 4px;
+	-webkit-appearance: none;
+	margin-right: 0;
+	border: 3px solid var(--color-text-dark);
+}
+
+.download-button:hover {
+	background-color: var(--color-primary);
+	color: var(--color-text-light);
+	border-color: var(--color-bg-alt);
+}
+
+.download-button:focus {
+	background-color: var(--color-blue-light);
+	outline: 3px solid var(--color-blue-light);
+	outline-offset: 3px;
+	box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.5);
+}
+
+.download-button:active {
+	background-color: var(--color-blue-dark);
+	color: var(--color-text-light);
+	transform: translateY(1px);
+	box-shadow: 0 1px 0 var(--color-text-dark);
+}
+
+/* Secondary button style */
+.download-button.secondary {
+	background-color: var(--color-text-light);
+	color: var(--color-text-dark);
+	border: 3px solid var(--color-text-dark);
+	box-shadow: none;
+	border-radius: 4px;
+}
+
+.download-button.secondary:hover {
+	background-color: var(--color-bg-dark);
+	color: var(--color-text-light);
+	border-color: var(--color-bg-alt);
+}
+
+.download-button.secondary:focus {
+	background-color: var(--color-text-light);
+	color: var(--color-text-dark);
+	outline: 3px solid var(--color-blue-light);
+	outline-offset: 3px;
+}
+
+.high-contrast .download-button {
+	background-color: #fff;
+	color: #000;
+	border-color: #000;
+}
+
+.high-contrast .download-button:hover {
+	background-color: #ddd;
+}
+
+.high-contrast .download-button.secondary {
+	background-color: #333;
+	color: #fff;
+	border-color: #fff;
+}
+
+.high-contrast .download-button.secondary:hover {
+	background-color: #444;
+}
+
+/* Journal entries with improved spacing and readability */
+.journal-entries {
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-4); /* Increased spacing between entries */
+	width: 100%;
+}
+
+.journal-entry {
+	background-color: #fff;
+	border-radius: 10px;
+	padding: var(--space-4); /* Increased padding for better readability */
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+	border-left: 5px solid;
+	transition: transform 0.2s ease, box-shadow 0.2s ease;
+	width: 100%;
+}
+
+.journal-entry:hover {
+	transform: translateY(-3px);
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.high-contrast .journal-entry {
+	background-color: #222;
+	border-color: #fff;
+}
+
+.experience-entry {
+	border-left-color: var(--color-blue-light);
+}
+
+.event-entry {
+	border-left-color: var(--color-primary); /* Red for events */
+}
+
+.entry-header {
+	display: flex;
+	justify-content: space-between;
+	margin-bottom: var(--space-3); /* Increased spacing */
+	align-items: center;
+	flex-wrap: wrap; /* Allow wrapping on small screens */
+	gap: var(--space-2); /* Gap when items wrap */
+}
+
+.entry-type {
+	background-color: #f8f9fa;
+	padding: var(--space-2) var(--space-3); /* Larger touch area */
+	border-radius: 6px;
+	font-weight: 600;
+	font-size: var(--font-size-16); /* Slightly larger for readability */
+}
+
+.high-contrast .entry-type {
+	background-color: #333;
+	color: #fff;
+}
+
+.experience-entry .entry-type {
+	color: var(--color-text-dark);
+	background-color: rgba(52, 152, 219, 0.1);
+}
+
+.event-entry .entry-type {
+	color: var(--color-text-dark);
+	background-color: rgba(231, 76, 60, 0.1);
+}
+
+.entry-date {
+	color: var(--color-text-muted);
+	font-size: var(--font-size-16); /* Increased for readability */
+}
+
+.high-contrast .entry-date {
+	color: #aaa;
+}
+
+/* Entry actions for edit/delete */
+.entry-actions {
+	display: flex;
+	gap: var(--space-2);
+}
+
+.edit-button,
+.delete-button {
+	padding: var(--space-2) var(--space-3);
+	min-height: 40px; /* Minimum touch target size */
+	min-width: 60px; /* Ensure button is wide enough */
+	border: none;
+	border-radius: 4px;
+	font-weight: 600;
+	cursor: pointer;
+	font-size: var(--font-size-16);
+}
+
+.edit-button {
+	background-color: var(--color-blue-light);
+	color: var(--color-text-dark);
+}
+
+.delete-button {
+	background-color: var(--color-primary);
+	color: var(--color-text-light);
+}
+
+.high-contrast .edit-button {
+	background-color: #fff;
+	color: #000;
+	border: 1px solid #000;
+}
+
+.high-contrast .delete-button {
+	background-color: #fff;
+	color: #000;
+	border: 1px solid #000;
+}
+
+/* Edit form styles */
+.entry-edit-form {
+	margin-top: var(--space-3);
+}
+
+.edit-content-textarea {
+	width: 100%;
+	padding: var(--space-3);
+	border: 2px solid #ddd;
+	border-radius: 6px;
+	font-size: var(--font-size-16);
+	min-height: 120px;
+	font-family: inherit;
+	margin-bottom: var(--space-3);
+}
+
+.edit-content-textarea:focus {
+	outline: none;
+	border-color: var(--color-primary);
+	box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
+.high-contrast .edit-content-textarea {
+	background-color: #333;
+	color: #fff;
+	border-color: #666;
+}
+
+.edit-tags-container {
+	margin-bottom: var(--space-3);
+}
+
+.edit-tags-input {
+	width: 100%;
+	padding: var(--space-3);
+	border: 2px solid #ddd;
+	border-radius: 6px;
+	font-size: var(--font-size-16);
+	height: 44px; /* Minimum touch target size */
+}
+
+.edit-tags-input:focus {
+	outline: none;
+	border-color: var(--color-primary);
+	box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
+.high-contrast .edit-tags-input {
+	background-color: #333;
+	color: #fff;
+	border-color: #666;
+}
+
+.edit-actions {
+	display: flex;
+	gap: var(--space-3);
+}
+
+.save-button,
+.cancel-button {
+	padding: var(--space-3) var(--space-4);
+	min-height: 44px; /* Minimum touch target size */
+	min-width: 100px; /* Ensure button is wide enough */
+	border: none;
+	border-radius: 4px;
+	font-weight: 600;
+	cursor: pointer;
+	font-size: var(--font-size-16);
+}
+
+.save-button {
+	background-color: var(--color-blue-light);
+	color: var(--color-text-dark);
+}
+
+.cancel-button {
+	background-color: #f8f9fa;
+	color: var(--color-text-dark);
+	border: 1px solid #ddd;
+}
+
+.high-contrast .save-button,
+.high-contrast .cancel-button {
+	background-color: #fff;
+	color: #000;
+	border: 1px solid #000;
+}
+
+.entry-content {
+	margin-bottom: var(--space-3);
+	line-height: 1.6;
+	font-size: var(--font-size-18); /* Increased for readability */
+}
+
+.entry-tags {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--space-2); /* Increased gap for better touch targets */
+}
+
+.tag {
+	background-color: #f0f2f5;
+	color: var(--color-text-dark);
+	padding: var(--space-2) var(--space-3); /* Larger touch area */
+	border-radius: 50px;
+	font-size: var(--font-size-16); /* Increased for readability */
+}
+
+.high-contrast .tag {
+	background-color: #333;
+	color: #fff;
+	border: 1px solid #fff;
+}
+
+.loading-message,
+.no-entries-message {
+	text-align: center;
+	padding: var(--space-4);
+	font-size: var(--font-size-19);
+	color: var(--color-text-muted);
+}
+
+.high-contrast .loading-message,
+.high-contrast .no-entries-message {
+	color: #ccc;
+}
+
+/* Status message for operations */
+.status-message {
+	padding: var(--space-3);
+	border-radius: 6px;
+	margin-bottom: var(--space-4);
+	font-size: var(--font-size-16);
+	font-weight: 600;
+	text-align: center;
+}
+
+.status-message.success {
+	background-color: rgba(39, 174, 96, 0.1);
+	color: #27ae60;
+	border: 1px solid #27ae60;
+}
+
+.status-message.error {
+	background-color: rgba(231, 76, 60, 0.1);
+	color: #e74c3c;
+	border: 1px solid #e74c3c;
+}
+
+.high-contrast .status-message.success {
+	background-color: #27ae60;
+	color: #fff;
+}
+
+.high-contrast .status-message.error {
+	background-color: #e74c3c;
+	color: #fff;
+}
+
+/* Add new entry button */
+.add-entry-button {
+	display: block;
+	width: 100%;
+	padding: var(--space-3);
+	min-height: 44px; /* Minimum touch target size */
+	background-color: #27ae60;
+	color: #fff;
+	border: none;
+	border-radius: 4px;
+	font-size: var(--font-size-16);
+	font-weight: 600;
+	cursor: pointer;
+	margin-top: var(--space-3);
+}
+
+.add-entry-button:hover {
+	background-color: #219653;
+}
+
+.add-entry-button:focus {
+	outline: none;
+	box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.3);
+}
+
+.high-contrast .add-entry-button {
+	background-color: #fff;
+	color: #000;
+	border: 1px solid #000;
+}
+
+/* Navigation links */
+.navigation-links {
+	display: flex;
+	gap: var(--space-3);
+	margin-top: var(--space-4);
+	margin-bottom: var(--space-3);
+	width: 100%;
+}
+
+/* Make navigation links match ho-button */
+.nav-link {
+	display: block;
+	flex: 1;
+	padding: var(--space-3) var(--space-2);
+	min-height: 44px; /* Minimum touch target size */
+	background-color: var(--color-blue-light);
+	color: var(--color-text-dark);
+	font-size: var(--font-size-16);
+	font-weight: 700;
+	line-height: 1.5;
+	text-align: center;
+	text-decoration: none;
+	cursor: pointer;
+	border-radius: 4px;
+	-webkit-appearance: none;
+	margin-right: 0;
+	border: 3px solid var(--color-text-dark);
+}
+
+.nav-link:hover {
+	background-color: var(--color-primary);
+	color: var(--color-text-light);
+	border-color: var(--color-bg-alt);
+	text-decoration: none;
+}
+
+.nav-link:focus {
+	background-color: var(--color-blue-light);
+	outline: 3px solid var(--color-blue-light);
+	outline-offset: 3px;
+	box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.5);
+}
+
+.nav-link:active {
+	background-color: var(--color-blue-dark);
+	color: var(--color-text-light);
+	transform: translateY(1px);
+	box-shadow: 0 1px 0 var(--color-text-dark);
+}
+
+.high-contrast .nav-link {
+	background-color: #fff;
+	color: #000;
+	border-color: #000;
+}
+
+.high-contrast .nav-link:hover {
+	background-color: #ddd;
+	color: #000;
+}
+
+.high-contrast .nav-link:focus {
+	outline-color: #fff;
+	box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.8);
+}
+
+/* Accessibility enhancements */
+@media (max-width: 768px) {
+	.journal-page {
+		padding: var(--space-2);
+	}
+
+	.journal-container {
+		padding: var(--space-3);
+	}
+
+	.journal-page h1 {
+		font-size: var(--font-size-27);
+	}
+
+	.date-filter {
+		flex-wrap: wrap;
+	}
+
+	.type-sort-row {
+		flex-direction: column;
+		gap: var(--space-2);
+	}
+
+	.date-filter input[type='date'] {
+		max-width: none;
+	}
+
+	.type-filter,
+	.sort-filter {
+		width: 100%;
+	}
+
+	.navigation-links,
+	.download-buttons {
+		flex-direction: column;
+	}
+
+	.nav-link,
+	.download-button {
+		width: 100%;
+		margin-bottom: var(--space-2);
+	}
+
+	.entry-header {
+		flex-direction: column;
+		align-items: flex-start;
+	}
+
+	.entry-actions {
+		margin-top: var(--space-2);
+		width: 100%;
+		justify-content: flex-end;
+	}
+
+	.edit-actions {
+		flex-direction: column;
+	}
+
+	.save-button,
+	.cancel-button {
+		width: 100%;
+	}
+}
+
+@media (max-width: 480px) {
+	.journal-content {
+		padding: var(--space-2) 0;
+	}
+
+	.journal-page h1 {
+		font-size: var(--font-size-24);
+	}
+
+	.entry-content {
+		font-size: var(--font-size-16);
+	}
+}
+
+/* Simplified UI overrides */
+.simplified-ui .journal-page h1 {
+	font-size: var(--font-size-36);
+	margin-bottom: var(--space-4);
+}
+
+.simplified-ui .journal-intro {
+	font-size: var(--font-size-24);
+	line-height: 1.6;
+	margin-bottom: var(--space-5);
+}
+
+.simplified-ui .search-input,
+.simplified-ui .journal-filters input,
+.simplified-ui .journal-filters select,
+.simplified-ui .download-button,
+.simplified-ui .nav-link {
+	font-size: var(--font-size-19);
+	padding: var(--space-3);
+}
+
+.simplified-ui .edit-button,
+.simplified-ui .delete-button,
+.simplified-ui .save-button,
+.simplified-ui .cancel-button,
+.simplified-ui .add-entry-button {
+	font-size: var(--font-size-19);
+	padding: var(--space-3) var(--space-4);
+}
+
+.simplified-ui .entry-content {
+	font-size: var(--font-size-19);
+	line-height: 1.7;
+}
+
+.simplified-ui .tag,
+.simplified-ui .entry-type,
+.simplified-ui .entry-date {
+	font-size: var(--font-size-18);
+	padding: var(--space-2) var(--space-3);
+}
+
+.simplified-ui .journal-entries {
+	gap: var(--space-5);
+}
+
+.simplified-ui .journal-entry {
+	padding: var(--space-4);
+}
+
+/* Large text mode */
+body.large-text .journal-container {
+	font-size: var(--font-size-19);
+}
+
+body.large-text .journal-page h1 {
+	font-size: var(--font-size-36);
+}
+
+/* Reduce motion */
+@media (prefers-reduced-motion: reduce) {
+	.journal-entry {
+		transition: none;
+	}
+
+	.journal-entry:hover {
+		transform: none;
+	}
+
+	.nav-link:hover,
+	.download-button:hover {
+		transform: none;
+	}
+
+	.nav-link:active,
+	.download-button:active {
+		transform: none;
+	}
+}
+
+/* Print styles for sharing journal entries */
+@media print {
+	body * {
+		visibility: hidden;
+	}
+
+	.journal-content,
+	.journal-content * {
+		visibility: visible;
+	}
+
+	.journal-content {
+		position: absolute;
+		left: 0;
+		top: 0;
+		width: 100%;
+		padding: 0;
+		margin: 0;
+		background-color: #fff;
+	}
+
+	.journal-filters,
+	.navigation-links,
+	.download-buttons,
+	.entry-actions,
+	.status-message {
+		display: none !important;
+	}
+
+	.journal-container {
+		box-shadow: none;
+		margin: 0;
+		page-break-inside: avoid;
+		border-radius: 0;
+		width: 100%;
+	}
+
+	.journal-page h1 {
+		font-size: 24pt;
+		text-align: center;
+		margin: 20px 0;
+		color: #000 !important;
+	}
+
+	.journal-intro {
+		text-align: center;
+		margin-bottom: 30px;
+		color: #333 !important;
+	}
+
+	.journal-entries {
+		gap: 30px;
+	}
+
+	.journal-entry {
+		break-inside: avoid;
+		border: 1px solid #ddd;
+		margin-bottom: 20px;
+		box-shadow: none;
+		color: #000 !important;
+	}
+
+	.entry-content p {
+		color: #000 !important;
+	}
+
+	.entry-header {
+		padding: 10px 0;
+	}
+
+	.entry-type {
+		font-weight: bold;
+		color: #000 !important;
+		background: none !important;
+	}
+
+	.entry-date {
+		color: #333 !important;
+	}
+
+	.entry-tags {
+		color: #555 !important;
+	}
+
+	.tag {
+		border: 1px solid #ddd;
+		background: none !important;
+		color: #555 !important;
+	}
+
+	.experience-entry,
+	.event-entry {
+		border-left-width: 10px;
+	}
+
+	.experience-entry {
+		border-left-color: #3498db !important;
+	}
+
+	.event-entry {
+		border-left-color: #e74c3c !important;
+	}
+
+	/* Add page numbers */
+	@page {
+		margin: 1cm;
+		@bottom-center {
+			content: 'Page ' counter(page) ' of ' counter(pages);
+		}
+	}
+
+	/* Add report title to the top of each page */
+	@page {
+		@top-center {
+			content: 'Ember Health Journal';
+			font-weight: bold;
+		}
+	}
+}

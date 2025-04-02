@@ -1,0 +1,478 @@
+import React, { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
+
+const PainVisualization = ({
+	category,
+	timeRange,
+	highContrast = false,
+	simplifiedUI = false,
+}) => {
+	const [visualizationData, setVisualizationData] = useState([]);
+	const [journalEvents, setJournalEvents] = useState([]);
+	const [loading, setLoading] = useState(true);
+	const [error, setError] = useState(null);
+	const [visibleCategories, setVisibleCategories] = useState({});
+
+	// Get all available categories for filtering
+	const [allCategories, setAllCategories] = useState([]);
+
+	useEffect(() => {
+		// Calculate the start date based on timeRange
+		const getStartDate = () => {
+			const now = new Date();
+			switch (timeRange) {
+				case 'week':
+					return new Date(now.setDate(now.getDate() - 7));
+				case 'month':
+					return new Date(now.setMonth(now.getMonth() - 1));
+				case '3months':
+					return new Date(now.setMonth(now.getMonth() - 3));
+				case '6months':
+					return new Date(now.setMonth(now.getMonth() - 6));
+				case 'year':
+					return new Date(now.setFullYear(now.getFullYear() - 1));
+				default:
+					return new Date(now.setDate(now.getDate() - 7));
+			}
+		};
+
+		const fetchData = async () => {
+			setLoading(true);
+			try {
+				// Try to fetch tracking entries first from /api/entries
+				let response = await fetch('http://localhost:5000/api/entries');
+
+				// If that fails, try without the /api prefix
+				if (!response.ok) {
+					response = await fetch('http://localhost:5000/entries');
+				}
+
+				if (!response.ok) {
+					throw new Error('Failed to fetch tracking data');
+				}
+
+				const data = await response.json();
+				console.log('Fetched visualization data:', data);
+
+				if (data.success && Array.isArray(data.entries)) {
+					// Extract all unique categories
+					const uniqueCategories = [
+						...new Set(data.entries.map((entry) => entry.category)),
+					];
+					setAllCategories(uniqueCategories);
+
+					// Initialize visible categories object if empty
+					if (Object.keys(visibleCategories).length === 0) {
+						const initialVisibility = {};
+						uniqueCategories.forEach((cat) => {
+							initialVisibility[cat] = true;
+						});
+						setVisibleCategories(initialVisibility);
+					}
+
+					// Filter entries by date range and selected categories
+					const startDate = getStartDate();
+					const filteredData = data.entries.filter((entry) => {
+						const entryDate = new Date(entry.timestamp);
+						return entryDate >= startDate;
+					});
+
+					setVisualizationData(filteredData);
+				} else {
+					setVisualizationData([]);
+				}
+
+				// Also fetch journal events for the timeline
+				let journalResponse = await fetch('http://localhost:5000/api/journal');
+
+				if (!journalResponse.ok) {
+					journalResponse = await fetch('http://localhost:5000/journal');
+				}
+
+				if (journalResponse.ok) {
+					const journalData = await journalResponse.json();
+
+					if (journalData.success && Array.isArray(journalData.journals)) {
+						// Filter journal entries by date range
+						const startDate = getStartDate();
+						const filteredJournalData = journalData.journals.filter((entry) => {
+							const entryDate = new Date(entry.timestamp);
+							return entryDate >= startDate && entry.type === 'event';
+						});
+
+						setJournalEvents(filteredJournalData);
+					} else {
+						setJournalEvents([]);
+					}
+				}
+			} catch (error) {
+				console.error('Error fetching visualization data:', error);
+				setError('Failed to load visualization data. Please try again later.');
+				setVisualizationData([]);
+				setJournalEvents([]);
+			} finally {
+				setLoading(false);
+			}
+		};
+
+		fetchData();
+	}, [category, timeRange]);
+
+	// Function to toggle category visibility
+	const toggleCategoryVisibility = (cat) => {
+		setVisibleCategories({
+			...visibleCategories,
+			[cat]: !visibleCategories[cat],
+		});
+	};
+
+	// Get dates for the x-axis based on timeRange
+	const getDates = () => {
+		const dates = [];
+		const now = new Date();
+		const startDate = new Date();
+
+		switch (timeRange) {
+			case 'week':
+				startDate.setDate(now.getDate() - 7);
+				for (let i = 0; i <= 7; i++) {
+					const date = new Date(startDate);
+					date.setDate(startDate.getDate() + i);
+					dates.push(date);
+				}
+				break;
+			case 'month':
+				startDate.setMonth(now.getMonth() - 1);
+				for (let i = 0; i <= 30; i++) {
+					const date = new Date(startDate);
+					date.setDate(startDate.getDate() + i);
+					dates.push(date);
+				}
+				break;
+			case '3months':
+				startDate.setMonth(now.getMonth() - 3);
+				// Add bi-weekly dates
+				while (startDate <= now) {
+					dates.push(new Date(startDate));
+					startDate.setDate(startDate.getDate() + 14);
+				}
+				break;
+			case '6months':
+				startDate.setMonth(now.getMonth() - 6);
+				// Add monthly dates
+				while (startDate <= now) {
+					dates.push(new Date(startDate));
+					startDate.setMonth(startDate.getMonth() + 1);
+				}
+				break;
+			case 'year':
+				startDate.setFullYear(now.getFullYear() - 1);
+				// Add monthly dates
+				while (startDate <= now) {
+					dates.push(new Date(startDate));
+					startDate.setMonth(startDate.getMonth() + 1);
+				}
+				break;
+			default:
+				startDate.setDate(now.getDate() - 7);
+				for (let i = 0; i <= 7; i++) {
+					const date = new Date(startDate);
+					date.setDate(startDate.getDate() + i);
+					dates.push(date);
+				}
+		}
+
+		return dates;
+	};
+
+	// Format date for display
+	const formatDate = (date) => {
+		if (timeRange === 'week') {
+			return date.toLocaleDateString('en-US', {
+				weekday: 'short',
+				month: 'numeric',
+				day: 'numeric',
+			});
+		} else if (timeRange === 'month') {
+			return date.toLocaleDateString('en-US', {
+				month: 'numeric',
+				day: 'numeric',
+			});
+		} else {
+			return date.toLocaleDateString('en-US', {
+				month: 'short',
+				day: 'numeric',
+			});
+		}
+	};
+
+	// Get entries for a specific date and category
+	const getEntriesForDate = (date, cat) => {
+		const startOfDay = new Date(date);
+		startOfDay.setHours(0, 0, 0, 0);
+
+		const endOfDay = new Date(date);
+		endOfDay.setHours(23, 59, 59, 999);
+
+		return visualizationData.filter((entry) => {
+			const entryDate = new Date(entry.timestamp);
+			return (
+				entryDate >= startOfDay &&
+				entryDate <= endOfDay &&
+				entry.category === cat
+			);
+		});
+	};
+
+	// Get journal events for a specific date
+	const getEventsForDate = (date) => {
+		const startOfDay = new Date(date);
+		startOfDay.setHours(0, 0, 0, 0);
+
+		const endOfDay = new Date(date);
+		endOfDay.setHours(23, 59, 59, 999);
+
+		return journalEvents.filter((event) => {
+			const eventDate = new Date(event.timestamp);
+			return eventDate >= startOfDay && eventDate <= endOfDay;
+		});
+	};
+
+	// Get color for severity level
+	const getSeverityColor = (severity, highContrast) => {
+		if (highContrast) {
+			switch (severity) {
+				case 1:
+					return '#000000';
+				case 2:
+					return '#333333';
+				case 3:
+					return '#666666';
+				case 4:
+					return '#999999';
+				case 5:
+					return '#CCCCCC';
+				default:
+					return '#EEEEEE';
+			}
+		} else {
+			switch (severity) {
+				case 1:
+					return '#E3F2FD';
+				case 2:
+					return '#90CAF9';
+				case 3:
+					return '#42A5F5';
+				case 4:
+					return '#1E88E5';
+				case 5:
+					return '#0D47A1';
+				default:
+					return '#E3F2FD';
+			}
+		}
+	};
+
+	// Compute maximum severity for a given set of entries
+	const getMaxSeverity = (entries) => {
+		if (!entries || entries.length === 0) return 0;
+		return Math.max(...entries.map((entry) => entry.severity));
+	};
+
+	// Render loading state
+	if (loading) {
+		return (
+			<div className='visualization-loading'>
+				<p>Loading your data...</p>
+			</div>
+		);
+	}
+
+	// Render error state
+	if (error) {
+		return (
+			<div className='visualization-error'>
+				<p>{error}</p>
+			</div>
+		);
+	}
+
+	// Render empty state
+	if (visualizationData.length === 0) {
+		return (
+			<div className='visualization-empty'>
+				<p>
+					No data available for the selected time range. Start tracking to see
+					your patterns!
+				</p>
+			</div>
+		);
+	}
+
+	// Get dates for x-axis
+	const dates = getDates();
+
+	return (
+		<div
+			className={`pain-visualization ${highContrast ? 'high-contrast' : ''} ${
+				simplifiedUI ? 'simplified' : ''
+			}`}
+		>
+			<div className='category-toggles'>
+				<h3>Toggle Categories:</h3>
+				<div className='toggle-buttons'>
+					{allCategories.map((cat) => (
+						<button
+							key={cat}
+							className={`toggle-button ${
+								visibleCategories[cat] ? 'active' : 'inactive'
+							}`}
+							onClick={() => toggleCategoryVisibility(cat)}
+						>
+							{cat}
+						</button>
+					))}
+				</div>
+			</div>
+
+			<div className='histogram-container'>
+				<div className='histogram-legend'>
+					<h3>Severity Level:</h3>
+					<div className='legend-items'>
+						<div className='legend-item'>
+							<span
+								className='legend-color'
+								style={{ backgroundColor: getSeverityColor(1, highContrast) }}
+							></span>
+							<span className='legend-label'>1 (Minimal)</span>
+						</div>
+						<div className='legend-item'>
+							<span
+								className='legend-color'
+								style={{ backgroundColor: getSeverityColor(2, highContrast) }}
+							></span>
+							<span className='legend-label'>2 (Mild)</span>
+						</div>
+						<div className='legend-item'>
+							<span
+								className='legend-color'
+								style={{ backgroundColor: getSeverityColor(3, highContrast) }}
+							></span>
+							<span className='legend-label'>3 (Moderate)</span>
+						</div>
+						<div className='legend-item'>
+							<span
+								className='legend-color'
+								style={{ backgroundColor: getSeverityColor(4, highContrast) }}
+							></span>
+							<span className='legend-label'>4 (Significant)</span>
+						</div>
+						<div className='legend-item'>
+							<span
+								className='legend-color'
+								style={{ backgroundColor: getSeverityColor(5, highContrast) }}
+							></span>
+							<span className='legend-label'>5 (Severe)</span>
+						</div>
+					</div>
+				</div>
+
+				<div className='histogram-chart'>
+					{/* X-axis: Dates */}
+					<div className='histogram-dates'>
+						{dates.map((date, index) => (
+							<div key={index} className='date-label'>
+								{formatDate(date)}
+							</div>
+						))}
+					</div>
+
+					{/* Y-axis: Categories and data */}
+					<div className='histogram-data'>
+						{allCategories
+							.filter((cat) => visibleCategories[cat])
+							.map((cat) => (
+								<div key={cat} className='category-row'>
+									<div className='category-label'>{cat}</div>
+									<div className='severity-bars'>
+										{dates.map((date, index) => {
+											const entries = getEntriesForDate(date, cat);
+											const maxSeverity = getMaxSeverity(entries);
+											const events = getEventsForDate(date);
+
+											return (
+												<div key={index} className='date-cell'>
+													{maxSeverity > 0 && (
+														<div
+															className='severity-bar'
+															style={{
+																backgroundColor: getSeverityColor(
+																	maxSeverity,
+																	highContrast
+																),
+																height: `${maxSeverity * 20}px`,
+															}}
+															title={`${cat}: Level ${maxSeverity} on ${formatDate(
+																date
+															)}`}
+														>
+															{maxSeverity}
+														</div>
+													)}
+													{events.length > 0 && (
+														<div
+															className='event-marker'
+															title='Event recorded on this date'
+														>
+															!
+														</div>
+													)}
+												</div>
+											);
+										})}
+									</div>
+								</div>
+							))}
+					</div>
+				</div>
+			</div>
+
+			{/* Events Timeline */}
+			{journalEvents.length > 0 && (
+				<div className='events-timeline'>
+					<h3>Events Timeline</h3>
+					<div className='timeline-entries'>
+						{journalEvents.map((event, index) => (
+							<div key={index} className='timeline-entry'>
+								<div className='timeline-date'>
+									{new Date(event.timestamp).toLocaleDateString('en-US', {
+										year: 'numeric',
+										month: 'short',
+										day: 'numeric',
+									})}
+								</div>
+								<div className='timeline-content'>
+									<div className='timeline-type'>
+										{event.eventType
+											? event.eventType.replace('_', ' ')
+											: 'Event'}
+									</div>
+									<div className='timeline-text'>{event.content}</div>
+								</div>
+							</div>
+						))}
+					</div>
+				</div>
+			)}
+		</div>
+	);
+};
+
+PainVisualization.propTypes = {
+	category: PropTypes.string,
+	timeRange: PropTypes.string,
+	highContrast: PropTypes.bool,
+	simplifiedUI: PropTypes.bool,
+};
+
+export default PainVisualization;

@@ -1,0 +1,23 @@
+{
+	"name": "ember-pain-tracking-service",
+	"version": "1.0.0",
+	"description": "Backend service for Ember Pain Tracking",
+	"main": "pain-tracking-service.js",
+	"scripts": {
+		"start": "node pain-tracking-service.js"
+	},
+	"dependencies": {
+		"axios": "^1.4.0",
+		"body-parser": "^1.20.2",
+		"cors": "^2.8.5",
+		"dotenv": "^16.4.7",
+		"express": "^4.21.2",
+		"mongodb": "^6.15.0",
+		"mongoose": "^8.13.1",
+		"node-fetch": "^3.3.2",
+		"winston": "^3.17.0"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC"
+}
