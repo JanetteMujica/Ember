@@ -1,0 +1,210 @@
+version: '3.1'
+
+stories:
+  - story: initial greeting
+    steps:
+      - intent: greet
+      - action: utter_greet
+      # No follow-up action - wait for user to select one of the buttons
+
+  - story: handle additional category flow
+    steps:
+      - action: action_save_tracking_preferences
+      - action: utter_ask_add_another_category
+      - intent: affirm # User wants to add another category
+      - action: action_handle_additional_category
+
+  - story: handle no more categories flow
+    steps:
+      - action: action_save_tracking_preferences
+      - action: utter_ask_add_another_category
+      - intent: deny # User doesn't want to add more categories
+      - action: action_handle_additional_category
+      - action: action_ask_track_now
+      - intent: affirm # User wants to track now
+      - action: action_start_tracking
+      
+  - story: deny tracking now
+    steps:
+      - action: action_ask_track_now
+      - intent: deny # User doesn't want to track now
+      - action: utter_main_options
+
+  - story: track daily life path with confirmation
+    steps:
+      - intent: track_daily_life
+      - action: utter_track_daily_life_intro
+      - action: utter_tracking_categories
+      - intent: select_physical_health
+      - action: utter_physical_health_categories
+      - intent: select_tracking_category
+        entities:
+          - category: 'tremors'
+      - slot_was_set:
+          - category: 'tremors'
+      - action: action_select_tracking_category
+      - intent: set_tracking_frequency
+        entities:
+          - frequency: 'daily'
+      - slot_was_set:
+          - frequency: 'daily'
+      - action: action_set_tracking_frequency
+      - intent: set_tracking_time
+        entities:
+          - time: '9am'
+      - slot_was_set:
+          - time: '9am'
+      - action: action_set_tracking_time
+      # The rest of the flow is handled by rules and other stories
+
+  - story: add single category and track
+    steps:
+      - intent: track_daily_life
+      - action: utter_track_daily_life_intro
+      - action: utter_tracking_categories
+      - intent: select_physical_health
+      - action: utter_physical_health_categories
+      - intent: select_tracking_category
+        entities:
+          - category: 'pain'
+      - slot_was_set:
+          - category: 'pain'
+      - action: action_select_tracking_category
+      - intent: set_tracking_frequency
+        entities:
+          - frequency: 'daily'
+      - slot_was_set:
+          - frequency: 'daily'
+      - action: action_set_tracking_frequency
+      - intent: set_tracking_time
+        entities:
+          - time: '9am'
+      - slot_was_set:
+          - time: '9am'
+      - action: action_set_tracking_time
+      # The rest of the flow is handled by rules and other stories
+
+  - story: add custom category flow
+    steps:
+      - intent: track_daily_life
+      - action: utter_track_daily_life_intro
+      - action: utter_tracking_categories
+      - intent: select_physical_health
+      - action: utter_physical_health_categories
+      - intent: add_custom_category
+      - action: action_add_custom_category
+      # The rest is handled by rules
+
+  # Modified existing stories to fix contradictions
+  - story: record event path - medication change
+    steps:
+      - intent: record_event
+      - action: utter_record_event_options
+      - intent: medication_change
+      - action: action_save_medication_event
+      # The rest is handled by rules
+
+  - story: record experience path
+    steps:
+      - intent: record_experience
+      - action: action_save_experience
+      # The rest is handled by rules
+
+  - story: view all categories
+    steps:
+      - intent: view_all_categories
+      - action: action_show_all_categories
+      - action: utter_tracking_categories
+
+  - story: update categories
+    steps:
+      - intent: update_categories
+      - action: action_get_current_categories
+      - action: utter_current_categories
+      - action: utter_ask_update_action
+      # The rest is handled by rules
+
+  - story: go to visualizations
+    steps:
+      - intent: view_visualizations
+      - action: action_redirect_to_visualize
+
+  - story: go to journal
+    steps:
+      - intent: go_to_journal
+      - action: action_redirect_to_journal
+
+  - story: create journal entry
+    steps:
+      - intent: create_journal_entry
+      - action: action_save_journal_entry
+      # The rest is handled by rules
+
+  - story: help
+    steps:
+      - intent: help
+      - action: utter_help
+      - action: utter_main_options
+
+  - story: physical health tracking from categories
+    steps:
+      - intent: select_physical_health
+      - action: utter_physical_health_categories
+      - intent: select_tracking_category
+      - action: action_select_tracking_category
+      - intent: set_tracking_frequency
+      - action: action_set_tracking_frequency
+      - intent: set_tracking_time
+      - action: action_set_tracking_time
+      # The rest is handled by rules
+
+  - story: mental health tracking from categories
+    steps:
+      - intent: select_mental_health
+      - action: utter_mental_health_categories
+      - intent: select_tracking_category
+      - action: action_select_tracking_category
+      - intent: set_tracking_frequency
+      - action: action_set_tracking_frequency
+      - intent: set_tracking_time
+      - action: action_set_tracking_time
+      # The rest is handled by rules
+
+  - story: lifestyle tracking from categories
+    steps:
+      - intent: select_lifestyle
+      - action: utter_lifestyle_categories
+      - intent: select_tracking_category
+      - action: action_select_tracking_category
+      - intent: set_tracking_frequency
+      - action: action_set_tracking_frequency
+      - intent: set_tracking_time
+      - action: action_set_tracking_time
+      # The rest is handled by rules
+
+  # Add rules for bot challenges and goodbyes
+  - story: say goodbye
+    steps:
+      - intent: goodbye
+      - action: utter_goodbye
+
+  - story: bot challenge
+    steps:
+      - intent: bot_challenge
+      - action: utter_iamabot
+
+  - story: record new symptom path
+    steps:
+      - intent: record_event
+      - action: utter_record_event_options
+      - intent: new_symptom
+      - action: action_save_new_symptom
+      # The rest is handled by rules
+
+  - story: record other event path
+    steps:
+      - intent: record_event
+      - action: utter_record_event_options
+      - intent: inform
+      - action: action_save_other_event
+      # The rest is handled by rules

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Track | Ember - A digital assistant for Parkinson's</title>
+    <!-- Server status monitoring script -->
+    <script>
+      // Function to check if Rasa server is available
+      function checkRasaServer() {
+        fetch('http://localhost:5005/')
+          .then(response => {
+            if (response.ok) {
+              console.log('Rasa server is online');
+              document.getElementById('server-status').innerHTML = '';
+              document.getElementById('server-status').style.display = 'none';
+            } else {
+              console.log('Rasa server returned error');
+              showServerError();
+            }
+          })
+          .catch(error => {
+            console.error('Error checking Rasa server:', error);
+            showServerError();
+          });
+      }
+
+      // Function to show server error message
+      function showServerError() {
+        const statusDiv = document.getElementById('server-status');
+        if (statusDiv) {
+          statusDiv.innerHTML = `
+            <div class="alert alert-warning">
+              <p><strong>Connection issue detected:</strong> Unable to connect to the Rasa server.</p>
+              <p>Please ensure the following services are running:</p>
+              <ol>
+                <li>Rasa server: <code>python -m rasa run --enable-api --cors "*"</code></li>
+                <li>Rasa action server: <code>python minimal_action_server.py</code></li>
+              </ol>
+            </div>
+          `;
+          statusDiv.style.display = 'block';
+        }
+      }
+
+      // Check server when page loads
+      window.addEventListener('DOMContentLoaded', () => {
+        setTimeout(checkRasaServer, 1000);
+        // Re-check periodically
+        setInterval(checkRasaServer, 10000);
+      });
+    </script>
+    <style>
+      .alert {
+        padding: 15px;
+        margin-bottom: 20px;
+        border: 1px solid transparent;
+        border-radius: 4px;
+      }
+      .alert-warning {
+        color: #8a6d3b;
+        background-color: #fcf8e3;
+        border-color: #faebcc;
+      }
+      code {
+        font-family: monospace;
+        background-color: #f5f5f5;
+        padding: 2px 4px;
+        border-radius: 3px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Server status message container -->
+    <div id="server-status" style="display: none; margin: 20px; max-width: 800px;"></div>
+    
+    <!-- React root -->
+    <div id="root"></div>
+  </body>
+</html>

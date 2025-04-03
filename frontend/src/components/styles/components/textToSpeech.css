@@ -1,0 +1,295 @@
+/* Text-to-Speech Widget Styles */
+.text-to-speech-widget {
+	position: fixed;
+	right: 20px;
+	bottom: 20px;
+	z-index: 1000;
+	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Toggle Button - Match the ho-button style */
+.tts-toggle-button {
+	width: 50px;
+	height: 50px;
+	border-radius: 50%;
+	background-color: var(--color-blue-light);
+	color: var(--color-text-dark);
+	border: 3px solid var(--color-text-dark);
+	font-size: 1.5rem;
+	cursor: pointer;
+	box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	-webkit-appearance: none;
+	transition: background-color 0.2s, transform 0.2s;
+}
+
+.tts-toggle-button:hover {
+	background-color: var(--color-primary-light);
+	color: var(--color-text-dark);
+	border-color: var(--color-bg-alt);
+}
+
+.tts-toggle-button:focus {
+	background-color: var(--color-blue-light);
+	outline: 3px solid var(--color-blue-light);
+	outline-offset: 3px;
+	box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.5);
+}
+
+.tts-toggle-button:active {
+	background-color: var(--color-blue-dark);
+	color: var(--color-text-light);
+	transform: translateY(1px);
+	box-shadow: 0 1px 0 var(--color-text-dark);
+}
+
+/* Expanded Controls */
+.tts-controls {
+	position: absolute;
+	bottom: 60px;
+	right: 0;
+	width: 300px;
+	background-color: var(--color-bg-dark);
+	border-radius: 8px;
+	box-shadow: 0 2px 15px rgba(0, 0, 0, 0.2);
+	padding: 15px;
+	transition: opacity 0.3s, transform 0.3s;
+	color: var(--color-text-light);
+}
+
+.text-to-speech-widget.collapsed .tts-controls {
+	opacity: 0;
+	transform: translateY(20px);
+	pointer-events: none;
+}
+
+.tts-controls h3 {
+	margin-top: 0;
+	margin-bottom: 15px;
+	font-size: var(--font-size-19);
+	color: var(--color-text-light);
+	font-weight: 700;
+}
+
+/* Buttons Container */
+.tts-buttons {
+	display: flex;
+	gap: 10px;
+	margin-bottom: 15px;
+}
+
+/* Style buttons like ho-button */
+.tts-button {
+	flex: 1;
+	padding: 8px 12px;
+	border: 0;
+	border-radius: 4px;
+	cursor: pointer;
+	font-weight: 700;
+	font-size: var(--font-size-16);
+	line-height: 1.5;
+	text-align: center;
+	-webkit-appearance: none;
+	border: 2px solid var(--color-text-light);
+	background-color: transparent;
+	color: var(--color-text-light);
+	min-height: 44px; /* Ensure good touch target */
+}
+
+.tts-button:hover {
+	background-color: rgba(255, 255, 255, 0.1);
+}
+
+.tts-button:focus {
+	outline: 3px solid var(--color-blue-light);
+	outline-offset: 3px;
+}
+
+.tts-button.start {
+	background-color: var(--color-blue-light);
+	color: var(--color-text-dark);
+	border-color: var(--color-text-dark);
+}
+
+.tts-button.start:hover {
+	background-color: var(--color-primary-light);
+}
+
+.tts-button.pause {
+	background-color: var(--color-primary);
+	color: var(--color-text-light);
+	border-color: var(--color-text-light);
+}
+
+.tts-button.resume {
+	background-color: var(--color-blue-light);
+	color: var(--color-text-dark);
+	border-color: var(--color-text-dark);
+}
+
+.tts-button.stop {
+	border-color: var(--color-text-light);
+}
+
+/* Settings */
+.tts-settings {
+	background-color: rgba(255, 255, 255, 0.1);
+	border-radius: 4px;
+	padding: 12px;
+}
+
+.tts-setting {
+	margin-bottom: 12px;
+}
+
+.tts-setting:last-child {
+	margin-bottom: 0;
+}
+
+.tts-setting label {
+	display: block;
+	margin-bottom: 5px;
+	font-weight: 600;
+	color: var(--color-text-light);
+	font-size: var(--font-size-16);
+}
+
+.tts-setting select {
+	width: 100%;
+	padding: 8px;
+	border: 1px solid var(--color-text-light);
+	border-radius: 4px;
+	font-size: var(--font-size-16);
+	margin-bottom: 5px;
+	background-color: var(--color-bg-dark);
+	color: var(--color-text-light);
+	min-height: 44px; /* Ensure good touch target */
+}
+
+.tts-setting input[type='range'] {
+	width: 80%;
+	vertical-align: middle;
+	min-height: 30px; /* Ensure good touch target */
+}
+
+.rate-value {
+	display: inline-block;
+	width: 15%;
+	text-align: right;
+	font-size: var(--font-size-16);
+	color: var(--color-text-light);
+}
+
+/* Disabled state */
+.tts-button:disabled,
+.tts-setting select:disabled,
+.tts-setting input:disabled {
+	opacity: 0.6;
+	cursor: not-allowed;
+}
+
+/* High Contrast Mode */
+.high-contrast .tts-toggle-button {
+	background-color: white;
+	color: black;
+	border: 3px solid black;
+}
+
+.high-contrast .tts-controls {
+	background-color: black;
+	border: 2px solid white;
+}
+
+.high-contrast .tts-button {
+	border: 2px solid white;
+	color: white;
+}
+
+.high-contrast .tts-button.start,
+.high-contrast .tts-button.resume {
+	background-color: white;
+	color: black;
+	border-color: black;
+}
+
+.high-contrast .tts-setting select {
+	background-color: black;
+	color: white;
+	border: 2px solid white;
+}
+
+/* Simplified UI for easier use */
+.simplified-ui .tts-toggle-button {
+	width: 60px;
+	height: 60px;
+	font-size: 1.8rem;
+}
+
+.simplified-ui .tts-controls {
+	width: 350px;
+	padding: 20px;
+}
+
+.simplified-ui .tts-controls h3 {
+	font-size: var(--font-size-24);
+	margin-bottom: 20px;
+}
+
+.simplified-ui .tts-button {
+	font-size: var(--font-size-19);
+	padding: 12px 16px;
+	min-height: 50px;
+}
+
+.simplified-ui .tts-setting label {
+	font-size: var(--font-size-19);
+	margin-bottom: 8px;
+}
+
+.simplified-ui .tts-setting select,
+.simplified-ui .rate-value {
+	font-size: var(--font-size-19);
+}
+
+.simplified-ui .tts-setting input[type='range'] {
+	min-height: 40px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+	.tts-controls {
+		width: 260px;
+		right: 0;
+	}
+
+	.tts-toggle-button {
+		width: 45px;
+		height: 45px;
+		font-size: 1.3rem;
+	}
+
+	.tts-buttons {
+		flex-direction: column;
+		gap: 8px;
+	}
+
+	.tts-settings {
+		padding: 10px;
+	}
+}
+
+/* Reduce motion */
+@media (prefers-reduced-motion: reduce) {
+	.tts-toggle-button,
+	.tts-controls,
+	.tts-button {
+		transition: none;
+	}
+
+	.tts-toggle-button:active,
+	.tts-button:active {
+		transform: none;
+	}
+}

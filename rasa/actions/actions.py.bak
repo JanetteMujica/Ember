@@ -1,0 +1,1564 @@
+from typing import Any, Text, Dict, List
+from rasa_sdk import Action, Tracker
+from rasa_sdk.executor import CollectingDispatcher
+from rasa_sdk.events import SlotSet, AllSlotsReset
+import requests
+import json
+import datetime
+from collections import defaultdict
+
+
+# Base URL for the Node.js backend
+BASE_URL = "http://localhost:5000"  # Changed from "http://localhost:5000/api"
+
+class ActionSaveTrackingPreferences(Action):
+    def name(self) -> Text:
+        return "action_save_tracking_preferences"
+
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        
+        category = tracker.get_slot("category")
+        frequency = tracker.get_slot("frequency")
+        time = tracker.get_slot("time")
+        
+        if not category or not frequency or not time:
+            dispatcher.utter_message(text="Sorry, I couldn't save your tracking preferences. Please try again.")
+            return []
+
+
+class ActionFinalizeTracking(Action):
+    def name(self) -> Text:
+        return "action_finalize_tracking"
+    
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        
+        # Get any categories that might be left to track
+        remaining_categories = tracker.get_slot("selected_categories") or []
+        
+        if remaining_categories:
+            next_cat = remaining_categories[0]
+            dispatcher.utter_message(
+                text=f"Would you like to track {next_cat} now or go to visualizations?",
+                buttons=[
+                    {"title": f"Track {next_cat}", "payload": f"/select_tracking_category{{\"category\":\"{next_cat}\"}}"},
+                    {"title": "Go to visualizations", "payload": "/view_visualizations"}
+                ]
+            )
+        else:
+            dispatcher.utter_message(text="All categories have been tracked. Taking you to visualizations.")
+            custom_message = {
+                "redirect": "/visualize.html?refresh=true"
+            }
+            dispatcher.utter_message(json_message=custom_message)
+        
+        return []
+
+# End of actions.py
+
+
+class ActionResetSlots(Action):
+    def name(self) -> Text:
+        return "action_reset_slots"
+    
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        
+        # Reset all slots to their default values
+        return [AllSlotsReset()]
+
+
+class ActionAskTrackNow(Action):
+    def name(self) -> Text:
+        return "action_ask_track_now"
+    
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        
+        category = tracker.get_slot("category")
+        
+        if not category:
+            dispatcher.utter_message(text="I'm not sure which category you want to track.")
+            return []
+        
+        dispatcher.utter_message(
+            text=f"Would you like to track {category} now?",
+            buttons=[
+                {"title": "Yes", "payload": "/affirm"},
+                {"title": "No", "payload": "/deny"}
+            ]
+        )
+        
+        return []
+
+
+# Additional action classes that were missing from your implementation
+
+class ActionSetTrackingFrequency(Action):
+    def name(self) -> Text:
+        return "action_set_tracking_frequency"
+
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        
+        # Get frequency from entity or direct input
+        frequency = next(tracker.get_latest_entity_values("frequency"), None)
+        
+        # If no entity found, check if it was a direct text input
+        if not frequency:
+            user_input = tracker.latest_message.get('text', '')
+            if user_input:
+                frequency = user_input
+        
+        print(f"DEBUG - Got frequency: {frequency}")
+        
+        if not frequency:
+            dispatcher.utter_message(text="Sorry, I couldn't understand your preferred tracking frequency. Please try again.")
+            return []
+        
+        # Set the frequency slot
+        events = [SlotSet("frequency", frequency)]
+        
+        # Get the category
+        category = tracker.get_slot("category")
+        
+        # Continue the conversation flow
+        dispatcher.utter_message(
+            text=f"At what time would you like to be reminded to track {category}?",
+            buttons=[
+                {"title": "Morning (9 AM)", "payload": "/set_tracking_time{\"time\":\"9am\"}"},
+                {"title": "Afternoon (2 PM)", "payload": "/set_tracking_time{\"time\":\"2pm\"}"},
+                {"title": "Evening (8 PM)", "payload": "/set_tracking_time{\"time\":\"8pm\"}"},
+                {"title": "Custom", "payload": "/inform"}
+            ]
+        )
+        
+        return events
+
+
+class ActionRateSeverity(Action):
+    def name(self) -> Text:
+        return "action_rate_severity"
+
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        
+        # Get severity from entity
+        severity = next(tracker.get_latest_entity_values("severity"), None)
+        
+        if not severity:
+            dispatcher.utter_message(text="Sorry, I couldn't understand your severity rating. Please try again on a scale of 1-5.")
+            return []
+        
+        # Set the severity slot
+        events = [SlotSet("severity", severity)]
+        
+        # Get the category being tracked
+        category = tracker.get_slot("category")
+        
+        # Confirm the severity rating
+        dispatcher.utter_message(text=f"Thank you for rating your {category} as {severity} out of 5.")
+        
+        # This action is typically followed by action_save_tracking_entry which will handle the API call
+        
+        return events
+
+
+class ActionStartTracking(Action):
+    def name(self) -> Text:
+        return "action_start_tracking"
+
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        
+        # Get the current category to track
+        category = tracker.get_slot("category")
+        
+        if not category:
+            dispatcher.utter_message(text="I'm not sure which category you want to track. Let's start over.")
+            return [SlotSet("requested_slot", None)]
+        
+        # Ask for severity rating
+        dispatcher.utter_message(
+            text=f"Please rate your current {category} level (1-5):",
+            buttons=[
+                {"title": "1 (Minimal)", "payload": f"/rate_severity{{\"severity\":\"1\"}}"},
+                {"title": "2 (Mild)", "payload": f"/rate_severity{{\"severity\":\"2\"}}"},
+                {"title": "3 (Moderate)", "payload": f"/rate_severity{{\"severity\":\"3\"}}"},
+                {"title": "4 (Significant)", "payload": f"/rate_severity{{\"severity\":\"4\"}}"},
+                {"title": "5 (Severe)", "payload": f"/rate_severity{{\"severity\":\"5\"}}"}
+            ]
+        )
+        
+        return []
+
+class ActionSetTrackingTime(Action):
+    def name(self) -> Text:
+        return "action_set_tracking_time"
+
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        
+        # Get time from entity or direct input
+        time = next(tracker.get_latest_entity_values("time"), None)
+        
+        # If no entity found, check if it was a direct text input
+        if not time:
+            user_input = tracker.latest_message.get('text', '')
+            if user_input:
+                time = user_input
+        
+        print(f"DEBUG - Got time: {time}")
+        
+        if not time:
+            dispatcher.utter_message(text="Sorry, I couldn't understand your preferred tracking time. Please try again.")
+            return []
+        
+        # Set the time slot
+        events = [SlotSet("time", time)]
+        
+        # Get category and frequency
+        category = tracker.get_slot("category")
+        frequency = tracker.get_slot("frequency")
+        
+        if not category or not frequency:
+            dispatcher.utter_message(text="Sorry, I'm missing some information. Let's start over.")
+            return events
+        
+        # Confirm the tracking setup
+        dispatcher.utter_message(text=f"Great! I've set up tracking for {category} {frequency} at {time}.")
+        
+        # Prepare data for the API call
+        data = {
+            "category": category,
+            "frequency": frequency,
+            "time": time,
+            "userId": "default_user"  # In a real app, you'd get this from authentication
+        }
+        
+        print(f"DEBUG - Attempting to save tracking preferences: {data}")
+        
+        try:
+            # Try both possible endpoints
+            endpoints = [
+                f"{BASE_URL}/tracking-preferences",
+                f"{BASE_URL}/api/tracking-preferences"
+            ]
+            
+            success = False
+            response = None
+            
+            for endpoint in endpoints:
+                try:
+                    print(f"DEBUG - Trying endpoint: {endpoint}")
+                    response = requests.post(endpoint, json=data)
+                    print(f"DEBUG - Response status: {response.status_code}")
+                    
+                    if response.status_code == 200 or response.status_code == 201:
+                        success = True
+                        break
+                except Exception as e:
+                    print(f"DEBUG - Error with endpoint {endpoint}: {str(e)}")
+                    continue
+            
+            # Ask if the user wants to add another category
+            dispatcher.utter_message(
+                text="Would you like to track another care priority?",
+                buttons=[
+                    {"title": "Yes", "payload": "/affirm"},
+                    {"title": "No, I'm done", "payload": "/deny"}
+                ]
+            )
+            
+            # Return the events
+            return events
+                
+        except Exception as e:
+            print(f"DEBUG - Final error: {str(e)}")
+            dispatcher.utter_message(text=f"Error connecting to the server: {str(e)}")
+            
+            # Still continue with the conversation flow
+            dispatcher.utter_message(
+                text="Would you like to track another care priority?",
+                buttons=[
+                    {"title": "Yes", "payload": "/affirm"},
+                    {"title": "No, I'm done", "payload": "/deny"}
+                ]
+            )
+            
+            return events
+
+class ActionSaveOtherEvent(Action):
+    def name(self) -> Text:
+        return "action_save_other_event"
+
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        
+        # Check if we need to prompt for event details first
+        if tracker.get_slot("requested_slot") is None:
+            dispatcher.utter_message(text="Please provide a short description of the event:")
+            return [SlotSet("requested_slot", "event_details")]
+            
+        # Otherwise, get the latest user message as the event details
+        for event in reversed(tracker.events):
+            if event.get('event') == 'user' and event.get('intent', {}).get('name') == 'inform':
+                event_details = event.get('text', '')
+                break
+        else:
+            event_details = ''  # Fallback if no user message found
+        
+        print(f"DEBUG - Got event details: {event_details}")
+        
+        if not event_details:
+            dispatcher.utter_message(text="Sorry, I couldn't understand your event details. Please try again.")
+            return [SlotSet("requested_slot", "event_details")]
+        
+        # Prepare data for the API call
+        data = {
+            "type": "event",
+            "eventType": "other",
+            "content": event_details,
+            "timestamp": datetime.datetime.now().isoformat(),
+            "tags": ["event"],
+            "userId": "default_user"
+        }
+        
+        print(f"DEBUG - Attempting to save other event: {data}")
+        
+        try:
+            # Try both possible endpoints
+            endpoints = [
+                f"{BASE_URL}/journal",
+                f"{BASE_URL}/api/journal"
+            ]
+            
+            success = False
+            response = None
+            
+            for endpoint in endpoints:
+                try:
+                    print(f"DEBUG - Trying endpoint: {endpoint}")
+                    response = requests.post(endpoint, json=data)
+                    print(f"DEBUG - Response status: {response.status_code}")
+                    
+                    if response.status_code == 200 or response.status_code == 201:
+                        success = True
+                        break
+                except Exception as e:
+                    print(f"DEBUG - Error with endpoint {endpoint}: {str(e)}")
+                    continue
+            
+            # First send confirmation even if API call failed
+            dispatcher.utter_message(text="I've recorded this event in your journal.")
+            
+            # Then redirect
+            custom_message = {
+                "redirect": "/journal.html?refresh=true"
+            }
+            dispatcher.utter_message(json_message=custom_message)
+            
+            # Clear the requested slot
+            return [SlotSet("event_details", event_details), SlotSet("requested_slot", None)]
+                
+        except Exception as e:
+            print(f"DEBUG - Final error: {str(e)}")
+            dispatcher.utter_message(text=f"Error connecting to the server: {str(e)}")
+            
+            # Still redirect to maintain conversation flow
+            custom_message = {
+                "redirect": "/journal.html?refresh=true"
+            }
+            dispatcher.utter_message(json_message=custom_message)
+            
+            # Clear the requested slot
+            return [SlotSet("event_details", event_details), SlotSet("requested_slot", None)]
+
+class ActionHandleAdditionalCategory(Action):
+    def name(self) -> Text:
+        return "action_handle_additional_category"
+
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        
+        # Check if user affirmed or denied adding another category
+        last_intent = tracker.latest_message.get('intent', {}).get('name', '')
+        
+        if last_intent == 'affirm':
+            # User wants to add another category, redirect back to categories selection
+            dispatcher.utter_message(text="Let's add another category to track.")
+            dispatcher.utter_message(
+                text="Which category would you like to track?",
+                buttons=[
+                    {"title": "Physical Health", "payload": "/select_physical_health"},
+                    {"title": "Mental Health", "payload": "/select_mental_health"},
+                    {"title": "Lifestyle & Well-Being", "payload": "/select_lifestyle"}
+                ]
+            )
+            return []
+        elif last_intent == 'deny':
+            # User doesn't want to add more categories, ask if they want to track now
+            # Get all the categories that have been set up
+            current_categories = tracker.get_slot("selected_categories") or []
+            
+            if current_categories:
+                # Take the first category for tracking
+                first_category = current_categories[0]
+                
+                dispatcher.utter_message(
+                    text=f"Would you like to track {first_category} now?",
+                    buttons=[
+                        {"title": "Yes", "payload": "/affirm"},
+                        {"title": "No, show me visualizations", "payload": "/view_visualizations"}
+                    ]
+                )
+                return [SlotSet("category", first_category)]
+            else:
+                # No categories set up yet, redirect to main options
+                dispatcher.utter_message(text="You haven't set up any categories to track yet.")
+                dispatcher.utter_message(
+                    text="What would you like to do?",
+                    buttons=[
+                        {"title": "Set up tracking", "payload": "/track_daily_life"},
+                        {"title": "Record an event", "payload": "/record_event"},
+                        {"title": "Write in journal", "payload": "/record_experience"}
+                    ]
+                )
+                return []
+        else:
+            # Unexpected intent, provide general options
+            dispatcher.utter_message(text="I'm not sure what you'd like to do next.")
+            dispatcher.utter_message(
+                text="What would you like to do?",
+                buttons=[
+                    {"title": "Set up tracking", "payload": "/track_daily_life"},
+                    {"title": "Record an event", "payload": "/record_event"},
+                    {"title": "Write in journal", "payload": "/record_experience"}
+                ]
+            )
+            return []
+
+class ActionSetTrackingFrequency(Action):
+    def name(self) -> Text:
+        return "action_set_tracking_frequency"
+
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        
+        # Get frequency from entity or direct input
+        frequency = next(tracker.get_latest_entity_values("frequency"), None)
+        
+        # If no entity found, check if it was a direct text input
+        if not frequency:
+            user_input = tracker.latest_message.get('text', '')
+            if user_input:
+                frequency = user_input
+        
+        print(f"DEBUG - Got frequency: {frequency}")
+        
+        if not frequency:
+            dispatcher.utter_message(text="Sorry, I couldn't understand your preferred tracking frequency. Please try again.")
+            return []
+        
+        # Set the frequency slot
+        events = [SlotSet("frequency", frequency)]
+        
+        # Get the category
+        category = tracker.get_slot("category")
+        
+        # Continue the conversation flow
+        dispatcher.utter_message(
+            text=f"At what time would you like to be reminded to track {category}?",
+            buttons=[
+                {"title": "Morning (9 AM)", "payload": "/set_tracking_time{\"time\":\"9am\"}"},
+                {"title": "Afternoon (2 PM)", "payload": "/set_tracking_time{\"time\":\"2pm\"}"},
+                {"title": "Evening (8 PM)", "payload": "/set_tracking_time{\"time\":\"8pm\"}"},
+                {"title": "Custom", "payload": "/inform"}
+            ]
+        )
+        
+        return events
+
+class ActionSetTrackingTime(Action):
+    def name(self) -> Text:
+        return "action_set_tracking_time"
+
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        
+        # Get time from entity or direct input
+        time = next(tracker.get_latest_entity_values("time"), None)
+        
+        # If no entity found, check if it was a direct text input
+        if not time:
+            user_input = tracker.latest_message.get('text', '')
+            if user_input:
+                time = user_input
+        
+        print(f"DEBUG - Got time: {time}")
+        
+        if not time:
+            dispatcher.utter_message(text="Sorry, I couldn't understand your preferred tracking time. Please try again.")
+            return []
+        
+        # Set the time slot
+        events = [SlotSet("time", time)]
+        
+        # Get category and frequency
+        category = tracker.get_slot("category")
+        frequency = tracker.get_slot("frequency")
+        
+        # Confirm the tracking setup
+        dispatcher.utter_message(text=f"Great! I've set up tracking for {category} {frequency} at {time}.")
+        
+        # We'll need to save these preferences in the backend, but that's handled by the
+        # action_save_tracking_preferences action which should be called next
+        
+        return events
+
+class ActionRateSeverity(Action):
+    def name(self) -> Text:
+        return "action_rate_severity"
+
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        
+        # Get severity from entity
+        severity = next(tracker.get_latest_entity_values("severity"), None)
+        
+        if not severity:
+            dispatcher.utter_message(text="Sorry, I couldn't understand your severity rating. Please try again on a scale of 1-5.")
+            return []
+        
+        # Set the severity slot
+        events = [SlotSet("severity", severity)]
+        
+        # Get the category being tracked
+        category = tracker.get_slot("category")
+        
+        # Confirm the severity rating
+        dispatcher.utter_message(text=f"Thank you for rating your {category} as {severity} out of 5.")
+        
+        # This action is typically followed by action_save_tracking_entry which will handle the API call
+        
+        return events
+
+class ActionStartTracking(Action):
+    def name(self) -> Text:
+        return "action_start_tracking"
+
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        
+        # Get the current category to track
+        category = tracker.get_slot("category")
+        
+        if not category:
+            dispatcher.utter_message(text="I'm not sure which category you want to track. Let's start over.")
+            return [SlotSet("requested_slot", None)]
+        
+        # Ask for severity rating
+        dispatcher.utter_message(
+            text=f"Please rate your current {category} level (1-5):",
+            buttons=[
+                {"title": "1 (Minimal)", "payload": f"/rate_severity{{\"severity\":\"1\"}}"},
+                {"title": "2 (Mild)", "payload": f"/rate_severity{{\"severity\":\"2\"}}"},
+                {"title": "3 (Moderate)", "payload": f"/rate_severity{{\"severity\":\"3\"}}"},
+                {"title": "4 (Significant)", "payload": f"/rate_severity{{\"severity\":\"4\"}}"},
+                {"title": "5 (Severe)", "payload": f"/rate_severity{{\"severity\":\"5\"}}"}
+            ]
+        )
+        
+        return []
+
+class ActionResetSlots(Action):
+    def name(self) -> Text:
+        return "action_reset_slots"
+    
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        
+        # Reset all slots to their default values
+        return [AllSlotsReset()]
+
+class ActionAskTrackNow(Action):
+    def name(self) -> Text:
+        return "action_ask_track_now"
+    
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        
+        category = tracker.get_slot("category")
+        
+        if not category:
+            dispatcher.utter_message(text="I'm not sure which category you want to track.")
+            return []
+        
+        dispatcher.utter_message(
+            text=f"Would you like to track {category} now?",
+            buttons=[
+                {"title": "Yes", "payload": "/affirm"},
+                {"title": "No", "payload": "/deny"}
+            ]
+        )
+        
+        return []
+
+class ActionFinalizeTracking(Action):
+    def name(self) -> Text:
+        return "action_finalize_tracking"
+    
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        
+        # Get any categories that might be left to track
+        remaining_categories = tracker.get_slot("selected_categories") or []
+        
+        # Get the current category that was just tracked
+        current_category = tracker.get_slot("category")
+        if current_category and current_category in remaining_categories:
+            # Remove the current category from the list
+            remaining_categories.remove(current_category)
+        
+        if remaining_categories:
+            next_cat = remaining_categories[0]
+            dispatcher.utter_message(
+                text=f"Would you like to track {next_cat} now or go to visualizations?",
+                buttons=[
+                    {"title": f"Track {next_cat}", "payload": f"/select_tracking_category{{\"category\":\"{next_cat}\"}}"},
+                    {"title": "Go to visualizations", "payload": "/view_visualizations"}
+                ]
+            )
+            return [SlotSet("selected_categories", remaining_categories)]
+        else:
+            dispatcher.utter_message(text="All categories have been tracked. Taking you to visualizations.")
+            custom_message = {
+                "redirect": "/visualize.html?refresh=true"
+            }
+            dispatcher.utter_message(json_message=custom_message)
+            return [SlotSet("selected_categories", [])]
+    
+# End of actions.py
+
+class ActionSaveOtherEvent(Action):
+    def name(self) -> Text:
+        return "action_save_other_event"
+
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        
+        # Check if we need to prompt for event details first
+        if tracker.get_slot("requested_slot") is None:
+            dispatcher.utter_message(text="Please provide a short description of the event:")
+            return [SlotSet("requested_slot", "event_details")]
+            
+        # Otherwise, get the latest user message as the event details
+        for event in reversed(tracker.events):
+            if event.get('event') == 'user' and event.get('intent', {}).get('name') == 'inform':
+                event_details = event.get('text', '')
+                break
+        else:
+            event_details = ''  # Fallback if no user message found
+        
+        print(f"DEBUG - Got event details: {event_details}")
+        
+        if not event_details:
+            dispatcher.utter_message(text="Sorry, I couldn't understand your event details. Please try again.")
+            return [SlotSet("requested_slot", "event_details")]
+        
+        # Prepare data for the API call
+        data = {
+            "type": "event",
+            "eventType": "other",
+            "content": event_details,
+            "timestamp": datetime.datetime.now().isoformat(),
+            "tags": ["event"],
+            "userId": "default_user"
+        }
+        
+        print(f"DEBUG - Attempting to save other event: {data}")
+        
+        try:
+            # Try both possible endpoints
+            endpoints = [
+                f"{BASE_URL}/journal",
+                f"{BASE_URL}/api/journal"
+            ]
+            
+            success = False
+            response = None
+            
+            for endpoint in endpoints:
+                try:
+                    print(f"DEBUG - Trying endpoint: {endpoint}")
+                    response = requests.post(endpoint, json=data)
+                    print(f"DEBUG - Response status: {response.status_code}")
+                    
+                    if response.status_code == 200 or response.status_code == 201:
+                        success = True
+                        break
+                except Exception as e:
+                    print(f"DEBUG - Error with endpoint {endpoint}: {str(e)}")
+                    continue
+            
+            # First send confirmation even if API call failed
+            dispatcher.utter_message(text="I've recorded this event in your journal.")
+            
+            # Then redirect
+            custom_message = {
+                "redirect": "/journal.html?refresh=true"
+            }
+            dispatcher.utter_message(json_message=custom_message)
+            
+            # Clear the requested slot
+            return [SlotSet("event_details", event_details), SlotSet("requested_slot", None)]
+                
+        except Exception as e:
+            print(f"DEBUG - Final error: {str(e)}")
+            dispatcher.utter_message(text=f"Error connecting to the server: {str(e)}")
+            
+            # Still redirect to maintain conversation flow
+            custom_message = {
+                "redirect": "/journal.html?refresh=true"
+            }
+            dispatcher.utter_message(json_message=custom_message)
+            
+            # Clear the requested slot
+            return [SlotSet("event_details", event_details), SlotSet("requested_slot", None)]
+
+class ActionHandleAdditionalCategory(Action):
+    def name(self) -> Text:
+        return "action_handle_additional_category"
+
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        
+        # Check if user affirmed or denied adding another category
+        last_intent = tracker.latest_message.get('intent', {}).get('name', '')
+        
+        if last_intent == 'affirm':
+            # User wants to add another category, redirect back to categories selection
+            dispatcher.utter_message(text="Let's add another category to track.")
+            dispatcher.utter_message(
+                text="Which category would you like to track?",
+                buttons=[
+                    {"title": "Physical Health", "payload": "/select_physical_health"},
+                    {"title": "Mental Health", "payload": "/select_mental_health"},
+                    {"title": "Lifestyle & Well-Being", "payload": "/select_lifestyle"}
+                ]
+            )
+            return []
+        elif last_intent == 'deny':
+            # User doesn't want to add more categories, ask if they want to track now
+            # Get all the categories that have been set up
+            current_categories = tracker.get_slot("selected_categories") or []
+            
+            if current_categories:
+                # Take the first category for tracking
+                first_category = current_categories[0]
+                
+                dispatcher.utter_message(
+                    text=f"Would you like to track {first_category} now?",
+                    buttons=[
+                        {"title": "Yes", "payload": "/affirm"},
+                        {"title": "No, show me visualizations", "payload": "/view_visualizations"}
+                    ]
+                )
+                return [SlotSet("category", first_category)]
+            else:
+                # No categories set up yet, redirect to main options
+                dispatcher.utter_message(text="You haven't set up any categories to track yet.")
+                dispatcher.utter_message(
+                    text="What would you like to do?",
+                    buttons=[
+                        {"title": "Set up tracking", "payload": "/track_daily_life"},
+                        {"title": "Record an event", "payload": "/record_event"},
+                        {"title": "Write in journal", "payload": "/record_experience"}
+                    ]
+                )
+                return []
+        else:
+            # Unexpected intent, provide general options
+            dispatcher.utter_message(text="I'm not sure what you'd like to do next.")
+            dispatcher.utter_message(
+                text="What would you like to do?",
+                buttons=[
+                    {"title": "Set up tracking", "payload": "/track_daily_life"},
+                    {"title": "Record an event", "payload": "/record_event"},
+                    {"title": "Write in journal", "payload": "/record_experience"}
+                ]
+            )
+            return []
+            
+            # If successful, update the selected_categories slot
+            current_categories = tracker.get_slot("selected_categories") or []
+            if category not in current_categories:
+                current_categories.append(category)
+            
+            # Confirm the category has been added and ask if they want to add another
+            dispatcher.utter_message(text=f"I've set up tracking for {category} {frequency} at {time}.")
+            
+            # Ask if the user wants to add another category
+            dispatcher.utter_message(
+                text="Would you like to track another care priority?",
+                buttons=[
+                    {"title": "Yes", "payload": "/affirm"},
+                    {"title": "No, I'm done", "payload": "/deny"}
+                ]
+            )
+            
+            # Continue with the conversation flow
+            return [SlotSet("selected_categories", current_categories)]
+                
+        except Exception as e:
+            print(f"DEBUG - Final error: {str(e)}")
+            dispatcher.utter_message(text=f"Error connecting to the server: {str(e)}")
+            
+            # Continue with the conversation flow regardless of API errors
+            current_categories = tracker.get_slot("selected_categories") or []
+            if category not in current_categories:
+                current_categories.append(category)
+            return [SlotSet("selected_categories", current_categories)]
+
+class ActionSaveTrackingEntry(Action):
+    def name(self) -> Text:
+        return "action_save_tracking_entry"
+
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        
+        # Get the latest user message for severity
+        for event in reversed(tracker.events):
+            if event.get('event') == 'user':
+                user_input = event.get('text', '')
+                # Try to extract a number from the input
+                import re
+                severity_match = re.search(r'\d+', user_input)
+                severity = severity_match.group(0) if severity_match else None
+                break
+        else:
+            severity = None
+        
+        # Get category from slot
+        category = tracker.get_slot("category")
+        
+        if not category or not severity:
+            dispatcher.utter_message(text="Sorry, I couldn't save your tracking entry. Please try again.")
+            return []
+        
+        # Prepare data for the API call
+        data = {
+            "category": category,
+            "severity": int(severity),
+            "timestamp": datetime.datetime.now().isoformat(),
+            "userId": "default_user"
+        }
+        
+        print(f"DEBUG - Attempting to save tracking entry: {data}")
+        
+        try:
+            # Try multiple possible endpoints
+            endpoints = [
+                f"{BASE_URL}/pain-entries",
+                f"{BASE_URL}/api/pain-entries",
+                f"{BASE_URL}/entries",
+                f"{BASE_URL}/api/entries"
+            ]
+            
+            success = False
+            response = None
+            
+            for endpoint in endpoints:
+                try:
+                    print(f"DEBUG - Trying endpoint: {endpoint}")
+                    response = requests.post(endpoint, json=data)
+                    print(f"DEBUG - Response status: {response.status_code}")
+                    
+                    if response.status_code == 200 or response.status_code == 201:
+                        success = True
+                        break
+                except Exception as e:
+                    print(f"DEBUG - Error with endpoint {endpoint}: {str(e)}")
+                    continue
+            
+            # Get the current categories being tracked
+            current_categories = tracker.get_slot("selected_categories") or []
+            remaining_categories = [cat for cat in current_categories if cat != category]
+            
+            # First send confirmation
+            dispatcher.utter_message(text=f"Thank you for tracking your {category}. This information will help identify patterns over time.")
+            
+            # If there are remaining categories to track, ask the user if they want to track now
+            if remaining_categories:
+                # Set the next category
+                next_category = remaining_categories[0]
+                
+                dispatcher.utter_message(
+                    text=f"You also set up tracking for {next_category}. Would you like to track it now?",
+                    buttons=[
+                        {"title": "Yes", "payload": f"/select_tracking_category{{\"category\":\"{next_category}\"}}"},
+                        {"title": "No, take me to visualizations", "payload": "/view_visualizations"}
+                    ]
+                )
+                return [SlotSet("category", next_category), SlotSet("requested_slot", None)]
+            else:
+                # If no more categories to track, redirect to visualization
+                dispatcher.utter_message(text="Taking you to the visualization page to see your data.")
+                custom_message = {
+                    "redirect": "/visualize.html?refresh=true"
+                }
+                dispatcher.utter_message(json_message=custom_message)
+                return [SlotSet("requested_slot", None)]
+                
+        except Exception as e:
+            print(f"DEBUG - Final error: {str(e)}")
+            dispatcher.utter_message(text=f"Error connecting to the server: {str(e)}")
+            
+            # Still redirect to maintain conversation flow
+            custom_message = {
+                "redirect": "/visualize.html?refresh=true"
+            }
+            dispatcher.utter_message(json_message=custom_message)
+            
+            return [SlotSet("requested_slot", None)]
+
+class ActionSaveMedicationEvent(Action):
+    def name(self) -> Text:
+        return "action_save_medication_event"
+
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        
+        # Check if we are just prompting for input
+        if tracker.get_slot("requested_slot") is None:
+            # Set the requested slot to mark what kind of input we're expecting
+            dispatcher.utter_message(text="Please describe the medication change (name, dosage, timing, etc.):")
+            return [SlotSet("requested_slot", "medication_details")]
+            
+        # Get the latest user message regardless of intent
+        for event in reversed(tracker.events):
+            if event.get('event') == 'user':
+                medication_details = event.get('text', '')
+                break
+        else:
+            medication_details = ''  # Fallback if no user message found
+        
+        print(f"DEBUG - Got medication details: {medication_details}")
+        
+        if not medication_details:
+            dispatcher.utter_message(text="Sorry, I couldn't understand the medication details. Please try again.")
+            return [SlotSet("requested_slot", "medication_details")]
+        
+        # Prepare data for the API call
+        data = {
+            "type": "event",
+            "eventType": "medication_change",
+            "content": medication_details,
+            "timestamp": datetime.datetime.now().isoformat(),
+            "userId": "default_user",
+            "tags": ["medication", "health"]
+        }
+        
+        print(f"DEBUG - Attempting to save medication event: {data}")
+        
+        try:
+            # Try both possible endpoints
+            endpoints = [
+                f"{BASE_URL}/journal",
+                f"{BASE_URL}/api/journal"
+            ]
+            
+            success = False
+            response = None
+            
+            for endpoint in endpoints:
+                try:
+                    print(f"DEBUG - Trying endpoint: {endpoint}")
+                    response = requests.post(endpoint, json=data)
+                    print(f"DEBUG - Response status: {response.status_code}")
+                    
+                    if response.status_code == 200 or response.status_code == 201:
+                        success = True
+                        break
+                except Exception as e:
+                    print(f"DEBUG - Error with endpoint {endpoint}: {str(e)}")
+                    continue
+            
+            # First send confirmation even if API call failed
+            dispatcher.utter_message(text="I've recorded your medication change in your journal.")
+            
+            # Then redirect
+            custom_message = {
+                "redirect": "/journal.html?refresh=true"
+            }
+            dispatcher.utter_message(json_message=custom_message)
+            
+            # Clear the requested slot after processing
+            return [SlotSet("medication_details", medication_details), SlotSet("requested_slot", None)]
+                
+        except Exception as e:
+            print(f"DEBUG - Final error: {str(e)}")
+            dispatcher.utter_message(text=f"Error connecting to the server: {str(e)}")
+            
+            # Still redirect to maintain conversation flow
+            custom_message = {
+                "redirect": "/journal.html?refresh=true"
+            }
+            dispatcher.utter_message(json_message=custom_message)
+            
+            # Clear the requested slot after processing
+            return [SlotSet("medication_details", medication_details), SlotSet("requested_slot", None)]
+
+class ActionSaveExperience(Action):
+    def name(self) -> Text:
+        return "action_save_experience"
+
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        
+        # Check if we're at the initial prompt stage
+        if tracker.get_slot("requested_slot") is None and tracker.latest_message.get('intent', {}).get('name') == 'record_experience':
+            dispatcher.utter_message(text="How are you today? What's going well for you? Are you experiencing any issues or concerns?")
+            return [SlotSet("requested_slot", "experience_content")]
+            
+        # Get the latest user message
+        for event in reversed(tracker.events):
+            if event.get('event') == 'user' and event.get('intent', {}).get('name', '') == 'inform':
+                experience_content = event.get('text', '')
+                break
+        else:
+            experience_content = ''  # Fallback if no user message found
+        
+        print(f"CHATBOT DEBUG - Content to save: {experience_content}")
+        
+        if not experience_content:
+            print("CHATBOT DEBUG - No content to save")
+            dispatcher.utter_message(text="Sorry, I couldn't capture your experience.")
+            return [SlotSet("requested_slot", "experience_content")]
+        
+        # Generate tags automatically based on content
+        auto_tags = ["daily_check_in"]
+        
+        # Simple keyword-based tag generation
+        keywords = {
+            "pain": "pain",
+            "tired": "fatigue",
+            "exhausted": "fatigue",
+            "fatigue": "fatigue",
+            "sleep": "sleep",
+            "insomnia": "sleep",
+            "anxiety": "anxiety",
+            "worried": "anxiety",
+            "stress": "stress",
+            "medication": "medication",
+            "meds": "medication",
+            "tremor": "tremor",
+            "shake": "tremor",
+            "shaking": "tremor",
+            "mood": "mood",
+            "happy": "mood",
+            "sad": "mood",
+            "depression": "depression",
+            "exercise": "exercise",
+            "walk": "exercise",
+            "walking": "mobility",
+            "balance": "balance",
+            "fall": "balance",
+            "dizzy": "dizziness",
+            "memory": "cognitive",
+            "forget": "cognitive",
+            "thinking": "cognitive",
+            "rigidity": "rigidity",
+            "stiff": "rigidity"
+        }
+        
+        # Check for keywords in the content and add corresponding tags
+        lower_content = experience_content.lower()
+        for keyword, tag in keywords.items():
+            if keyword in lower_content and tag not in auto_tags:
+                auto_tags.append(tag)
+        
+        # Prepare data for the journal entry
+        data = {
+            "type": "experience",
+            "content": experience_content,
+            "timestamp": datetime.datetime.now().isoformat(),
+            "tags": auto_tags,
+            "userId": "default_user"
+        }
+        
+        print(f"CHATBOT DEBUG - Sending data to API: {data}")
+        
+        try:
+            # Try both possible endpoints
+            endpoints = [
+                f"{BASE_URL}/journal",
+                f"{BASE_URL}/api/journal"
+            ]
+            
+            success = False
+            response = None
+            
+            for endpoint in endpoints:
+                try:
+                    print(f"DEBUG - Trying endpoint: {endpoint}")
+                    response = requests.post(endpoint, json=data)
+                    print(f"DEBUG - Response status: {response.status_code}")
+                    
+                    if response.status_code == 200 or response.status_code == 201:
+                        success = True
+                        break
+                except Exception as e:
+                    print(f"DEBUG - Error with endpoint {endpoint}: {str(e)}")
+                    continue
+                    
+            print(f"CHATBOT DEBUG - API response status: {response.status_code if response else 'None'}")
+            if response:
+                print(f"CHATBOT DEBUG - API response body: {response.text}")
+            
+            # Display the generated tags
+            tags_display = ", ".join(auto_tags)
+            
+            # First send a confirmation message
+            dispatcher.utter_message(text=f"Thank you for sharing your experience. I've added this to your journal with the following tags: {tags_display}")
+            
+            # Then send the redirect command
+            custom_message = {
+                "redirect": "/journal.html?refresh=true"
+            }
+            dispatcher.utter_message(json_message=custom_message)
+            
+            # Clear the requested slot
+            return [SlotSet("experience_content", experience_content), SlotSet("requested_slot", None)]
+                
+        except Exception as e:
+            print(f"DEBUG - Final error: {str(e)}")
+            dispatcher.utter_message(text=f"Error saving your experience: {str(e)}")
+            
+            # Still redirect to maintain conversation flow
+            custom_message = {
+                "redirect": "/journal.html?refresh=true"
+            }
+            dispatcher.utter_message(json_message=custom_message)
+            
+            # Clear the requested slot
+            return [SlotSet("experience_content", experience_content), SlotSet("requested_slot", None)]
+
+class ActionAddCustomCategory(Action):
+    def name(self) -> Text:
+        return "action_add_custom_category"
+
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        
+        # Check if we are just asking for input
+        if tracker.get_slot("requested_slot") is None:
+            dispatcher.utter_message(text="What custom category would you like to add?")
+            return [SlotSet("requested_slot", "custom_category")]
+            
+        # Get the latest user message to extract the custom category
+        for event in reversed(tracker.events):
+            if event.get('event') == 'user':
+                custom_category = event.get('text', '')
+                break
+        else:
+            custom_category = ''  # Fallback if no user message found
+        
+        if not custom_category:
+            dispatcher.utter_message(text="Sorry, I couldn't understand the custom category. Please try again.")
+            return [SlotSet("requested_slot", "custom_category")]
+        
+        # Update the selected_categories slot
+        current_categories = tracker.get_slot("selected_categories") or []
+        if custom_category not in current_categories:
+            current_categories.append(custom_category)
+        
+        # Set the category slot first
+        events = [
+            SlotSet("custom_category", custom_category),
+            SlotSet("category", custom_category),
+            SlotSet("selected_categories", current_categories),
+            SlotSet("requested_slot", None)
+        ]
+        
+        # Now we can use the category in messages
+        dispatcher.utter_message(text=f"I've added '{custom_category}' as a new tracking category.")
+        
+        # Ask about tracking frequency for this custom category
+        dispatcher.utter_message(
+            text=f"How often would you like to track {custom_category}?",
+            buttons=[
+                {"title": "Daily", "payload": "/set_tracking_frequency{\"frequency\":\"daily\"}"},
+                {"title": "Twice a day", "payload": "/set_tracking_frequency{\"frequency\":\"twice a day\"}"},
+                {"title": "Weekly", "payload": "/set_tracking_frequency{\"frequency\":\"weekly\"}"},
+                {"title": "Custom", "payload": "/inform"}
+            ]
+        )
+        
+        return events
+
+class ActionShowAllCategories(Action):
+    def name(self) -> Text:
+        return "action_show_all_categories"
+
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        
+        # For a real implementation, you might want to fetch this from a database
+        taxonomy = """
+1) Physical Health (Movement & Body Functions)
+   a) Moving & Walking: Tremors, Rigidity, Bradykinesia, Postural/gait impairment
+   b) Body Reactions & sensations: Pain, Orthostatic hypotension, Sweating Problems, Skin Problems
+   c) Bladder, Digestion & Swallowing: Constipation, Urinary Issues, Swallowing Problems, Saliva Control, Eating Problems
+   d) Sleep disorders & Fatigue: Insomnia, Daytime sleepiness, Restless Legs, Fatigue
+   e) Sensory Changes: Loss of smell, Vision Problems, Abnormal sensations
+
+2) Mental Health (Mood, Emotions & Thinking)
+   a) Feeling worried or anxious: Anxiety, Panic Attack, Impulse control, Apathy, Depression
+   b) Thinking & Memory: Memory Problems, Cognitive Changes, Difficulty focusing
+   c) Seeing or hearing things: Hallucinations, Delusions, Illusions
+
+3) Lifestyle & Well-Being
+   a) Staying Active: Exercise & Physical activity, Hobbies
+   b) Social Life & Relationship: Living Alone, Intimacy, Sexuality
+   c) Diet & Nutrition: Weight, Nutrition advices
+   d) Managing Daily Tasks: Reorganizing Home, Using Assistive Tools, Adapting Routines
+   e) Medication & Treatment: Managing medication, Understanding side effects, Information about new treatments
+        """
+        
+        dispatcher.utter_message(text="Here is the full taxonomy of aspects you can track:")
+        dispatcher.utter_message(text=taxonomy)
+        
+        return []
+
+class ActionGetCurrentCategories(Action):
+    def name(self) -> Text:
+        return "action_get_current_categories"
+
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        
+        # Get the currently tracked categories from the slot
+        current_categories = tracker.get_slot("selected_categories") or []
+        
+        if not current_categories:
+            dispatcher.utter_message(text="You're not currently tracking any categories.")
+        else:
+            categories_text = ", ".join(current_categories)
+            dispatcher.utter_message(text=f"You're currently tracking: {categories_text}")
+        
+        return []
+
+class ActionUpdateCategories(Action):
+    def name(self) -> Text:
+        return "action_update_categories"
+
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        
+        update_action = tracker.latest_message.get('text', '').lower()
+        current_categories = tracker.get_slot("selected_categories") or []
+        
+        if "remove" in update_action or "delete" in update_action:
+            # Extract the category name to remove
+            parts = update_action.split()
+            for i, part in enumerate(parts):
+                if part in ["remove", "delete"] and i+1 < len(parts):
+                    category_to_remove = parts[i+1]
+                    if category_to_remove in current_categories:
+                        current_categories.remove(category_to_remove)
+                        dispatcher.utter_message(text=f"Removed '{category_to_remove}' from your tracking categories.")
+                    else:
+                        dispatcher.utter_message(text=f"You're not currently tracking '{category_to_remove}'.")
+                    break
+        else:
+            dispatcher.utter_message(text="I couldn't understand which category to update. Please try again.")
+        
+        # Try to save the updated categories to both possible endpoints
+        data = {
+            "categories": current_categories,
+            "userId": "default_user"
+        }
+        
+        try:
+            # Try both possible endpoints
+            endpoints = [
+                f"{BASE_URL}/user-preferences",
+                f"{BASE_URL}/api/user-preferences"
+            ]
+            
+            for endpoint in endpoints:
+                try:
+                    print(f"DEBUG - Trying to update categories at endpoint: {endpoint}")
+                    response = requests.post(endpoint, json=data)
+                    print(f"DEBUG - Response status: {response.status_code}")
+                    
+                    if response.status_code == 200 or response.status_code == 201:
+                        print("DEBUG - Successfully saved updated categories")
+                        break
+                except Exception as e:
+                    print(f"DEBUG - Error with endpoint {endpoint}: {str(e)}")
+                    continue
+        except Exception as e:
+            print(f"DEBUG - Error updating categories: {str(e)}")
+            # Continue with local updates even if server update fails
+        
+        return [SlotSet("selected_categories", current_categories)]
+
+class ActionRedirectToVisualize(Action):
+    def name(self) -> Text:
+        return "action_redirect_to_visualize"
+
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        
+        # Send a message with JavaScript to redirect the page
+        dispatcher.utter_message(text="Taking you to your visualizations...")
+        dispatcher.utter_message(json_message={"redirect": "/visualize.html"})
+        
+        return []
+
+class ActionRedirectToJournal(Action):
+    def name(self) -> Text:
+        return "action_redirect_to_journal"
+
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        
+        # Send a message with JavaScript to redirect the page
+        dispatcher.utter_message(text="Taking you to your journal...")
+        dispatcher.utter_message(json_message={"redirect": "/journal.html"})
+        
+        return []
+
+class ActionSaveJournalEntry(Action):
+    def name(self) -> Text:
+        return "action_save_journal_entry"
+
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        
+        # Check if we need to prompt for journal content
+        if tracker.get_slot("requested_slot") is None:
+            dispatcher.utter_message(text="What would you like to add to your journal?")
+            return [SlotSet("requested_slot", "journal_content")]
+        
+        # Get the latest user message
+        for event in reversed(tracker.events):
+            if event.get('event') == 'user':
+                journal_content = event.get('text', '')
+                break
+        else:
+            journal_content = ''  # Fallback if no user message found
+        
+        if not journal_content:
+            dispatcher.utter_message(text="Sorry, I couldn't understand your journal entry. Please try again.")
+            return [SlotSet("requested_slot", "journal_content")]
+        
+        # Prepare data for the API call
+        data = {
+            "type": "experience",
+            "content": journal_content,
+            "timestamp": datetime.datetime.now().isoformat(),
+            "tags": ["journal"],
+            "userId": "default_user"
+        }
+        
+        print(f"DEBUG - Attempting to save journal entry: {data}")
+        
+        try:
+            # Try both possible endpoints
+            endpoints = [
+                f"{BASE_URL}/journal",
+                f"{BASE_URL}/api/journal"
+            ]
+            
+            success = False
+            response = None
+            
+            for endpoint in endpoints:
+                try:
+                    print(f"DEBUG - Trying endpoint: {endpoint}")
+                    response = requests.post(endpoint, json=data)
+                    print(f"DEBUG - Response status: {response.status_code}")
+                    
+                    if response.status_code == 200 or response.status_code == 201:
+                        success = True
+                        break
+                except Exception as e:
+                    print(f"DEBUG - Error with endpoint {endpoint}: {str(e)}")
+                    continue
+            
+            # Send confirmation regardless of API success
+            dispatcher.utter_message(text="Thank you. Your journal entry has been saved.")
+            
+            # Add redirect to journal page
+            custom_message = {
+                "redirect": "/journal.html?refresh=true"
+            }
+            dispatcher.utter_message(json_message=custom_message)
+            
+            return [SlotSet("journal_content", journal_content), SlotSet("requested_slot", None)]
+                
+        except Exception as e:
+            print(f"DEBUG - Final error: {str(e)}")
+            dispatcher.utter_message(text=f"Error connecting to the server: {str(e)}")
+            
+            # Still redirect to maintain conversation flow
+            custom_message = {
+                "redirect": "/journal.html?refresh=true"
+            }
+            dispatcher.utter_message(json_message=custom_message)
+            
+            return [SlotSet("journal_content", journal_content), SlotSet("requested_slot", None)]
+
+class ActionSelectTrackingCategory(Action):
+    def name(self) -> Text:
+        return "action_select_tracking_category"
+
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        
+        # Extract category from entity
+        category = next(tracker.get_latest_entity_values("category"), None)
+        
+        if not category:
+            dispatcher.utter_message(text="I didn't understand which category you want to track. Could you try again?")
+            return []
+        
+        # Set the slot first
+        events = [SlotSet("category", category)]
+        
+        # Now it's safe to use the category in a template
+        dispatcher.utter_message(text=f"You've selected to track {category}.")
+        
+        # Continue with the next step in the flow
+        dispatcher.utter_message(
+            text=f"How often would you like to track {category}?",
+            buttons=[
+                {"title": "Daily", "payload": "/set_tracking_frequency{\"frequency\":\"daily\"}"},
+                {"title": "Twice a day", "payload": "/set_tracking_frequency{\"frequency\":\"twice a day\"}"},
+                {"title": "Weekly", "payload": "/set_tracking_frequency{\"frequency\":\"weekly\"}"},
+                {"title": "Custom", "payload": "/inform"}
+            ]
+        )
+        
+        return events
+
+class ActionSaveNewSymptom(Action):
+    def name(self) -> Text:
+        return "action_save_new_symptom"
+
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        
+        # Check if we need to prompt for symptom details first
+        if tracker.get_slot("requested_slot") is None and tracker.latest_message.get('intent', {}).get('name') == 'new_symptom':
+            dispatcher.utter_message(text="Please describe your new symptom in detail:")
+            return [SlotSet("requested_slot", "symptom_details")]
+            
+        # Otherwise, get the latest user message as the symptom details
+        for event in reversed(tracker.events):
+            if event.get('event') == 'user' and event.get('intent', {}).get('name') == 'inform':
+                symptom_details = event.get('text', '')
+                break
+        else:
+            symptom_details = ''  # Fallback if no user message found
+        
+        print(f"DEBUG - Got symptom details: {symptom_details}")
+        
+        if not symptom_details:
+            dispatcher.utter_message(text="Sorry, I couldn't understand your symptom details. Please try again.")
+            return [SlotSet("requested_slot", "symptom_details")]
+        
+        # Prepare data for the API call
+        data = {
+            "type": "event",
+            "eventType": "new_symptom",
+            "content": symptom_details,
+            "timestamp": datetime.datetime.now().isoformat(),
+            "tags": ["symptom", "health"],
+            "userId": "default_user"
+        }
+        
+        print(f"DEBUG - Attempting to save new symptom: {data}")
+        
+        try:
+            # Try both possible endpoints
+            endpoints = [
+                f"{BASE_URL}/journal",
+                f"{BASE_URL}/api/journal"
+            ]
+            
+            success = False
+            response = None
+            
+            for endpoint in endpoints:
+                try:
+                    print(f"DEBUG - Trying endpoint: {endpoint}")
+                    response = requests.post(endpoint, json=data)
+                    print(f"DEBUG - Response status: {response.status_code}")
+                    
+                    if response.status_code == 200 or response.status_code == 201:
+                        success = True
+                        break
+                except Exception as e:
+                    print(f"DEBUG - Error with endpoint {endpoint}: {str(e)}")
+                    continue
+            
+            # First send confirmation even if API call failed
+            dispatcher.utter_message(text="I've recorded your new symptom in your journal.")
+            
+            # Then redirect
+            custom_message = {
+                "redirect": "/journal.html?refresh=true"
+            }
+            dispatcher.utter_message(json_message=custom_message)
+            
+            # Clear the requested slot
+            return [SlotSet("symptom_details", symptom_details), SlotSet("requested_slot", None)]
+                
+        except Exception as e:
+            print(f"DEBUG - Final error: {str(e)}")
+            dispatcher.utter_message(text=f"Error connecting to the server: {str(e)}")
+            
+            # Still redirect to maintain conversation flow
+            custom_message = {
+                "redirect": "/journal.html?refresh=true"
+            }
+            dispatcher.utter_message(json_message=custom_message)
+            
+            # Clear the requested slot
+            return [SlotSet("symptom_details", symptom_details), SlotSet("requested_slot", None)]

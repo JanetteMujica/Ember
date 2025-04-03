@@ -1,0 +1,90 @@
+/* src/styles/pages/track.css */
+
+/* Main content container */
+.track-content {
+	padding: var(--space-4) 0;
+	min-height: 80vh;
+	background-color: var(--color-primary-bg);
+}
+
+/* Use ho-width-container class from layout.css instead of redefining container */
+/* .ho-width-container is already defined in layout.css */
+
+/* Page title and intro */
+h1 {
+	font-size: var(--font-size-32);
+	color: var(--color-text-dark);
+	margin-bottom: var(--space-3);
+	font-weight: 600;
+}
+
+.high-contrast h1 {
+	color: var(--color-text-light);
+}
+
+.intro-text {
+	font-size: var(--font-size-19);
+	color: var(--color-text-dark);
+	max-width: 800px;
+	margin-bottom: var(--space-4);
+	line-height: 1.5;
+}
+
+.high-contrast .intro-text {
+	color: #ccc;
+}
+
+/* Chatbot container - make sure this matches the width of ho-width-container */
+.chatbot-container {
+	width: 100%;
+	margin: 0 auto var(--space-5) auto;
+}
+
+/* Simplified UI overrides */
+.simplified-ui h1 {
+	font-size: var(--font-size-36);
+	margin-bottom: var(--space-4);
+}
+
+.simplified-ui .intro-text {
+	font-size: var(--font-size-24);
+	line-height: 1.6;
+	margin-bottom: var(--space-5);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+	.track-content {
+		padding: var(--space-3) 0;
+	}
+
+	h1 {
+		font-size: var(--font-size-27);
+	}
+
+	.simplified-ui h1 {
+		font-size: var(--font-size-32);
+	}
+
+	.intro-text {
+		font-size: var(--font-size-16);
+	}
+
+	.simplified-ui .intro-text {
+		font-size: var(--font-size-19);
+	}
+}
+
+@media (max-width: 480px) {
+	.track-content {
+		padding: var(--space-2) 0;
+	}
+
+	h1 {
+		font-size: var(--font-size-24);
+	}
+
+	.simplified-ui h1 {
+		font-size: var(--font-size-27);
+	}
+}
